@@ -16,6 +16,7 @@ Gespeichert werden:
 Bei nicht installiertem ChromaDB: graceful fallback auf SQLite-Suche.
 Installation: pip install chromadb
 """
+from __future__ import annotations
 
 import json
 import os

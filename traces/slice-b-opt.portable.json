@@ -1,0 +1,136 @@
+{
+  "schema": "isaac.decision_trace.portable_v1_1",
+  "request_id": "slice-b-opt",
+  "service": "isaac-cognitive-kernel",
+  "entries": [
+    {
+      "sequence": 1,
+      "ts": 1790250906.6362112,
+      "phase": "classification",
+      "event": "classified",
+      "data": {
+        "class": "NORMAL_CHAT"
+      }
+    },
+    {
+      "sequence": 2,
+      "ts": 1790250906.6362188,
+      "phase": "execution",
+      "event": "model_call",
+      "data": {
+        "provider": "groq",
+        "model": "llama-test",
+        "iteration": 0,
+        "prompt_chars": 40,
+        "response_chars": 20,
+        "ok": true,
+        "latency_ms": 12.5,
+        "model_call_ms": 12.5,
+        "input_tokens": "[REDACTED]",
+        "output_tokens": "[REDACTED]",
+        "total_tokens": "[REDACTED]",
+        "gen_ai.system": "groq",
+        "gen_ai.request.model": "llama-test",
+        "gen_ai.response.model": "llama-test",
+        "gen_ai.usage.input_tokens": "[REDACTED]",
+        "gen_ai.usage.output_tokens": "[REDACTED]",
+        "gen_ai.usage.total_tokens": "[REDACTED]"
+      }
+    }
+  ],
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": {
+          "service.name": "isaac-cognitive-kernel"
+        }
+      },
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "isaac.decision_trace"
+          },
+          "spans": [
+            {
+              "traceId": "slice-b-opt",
+              "spanId": "root-slice-b-opt",
+              "name": "isaac.request",
+              "kind": "SERVER",
+              "startTimeUnixNano": 1790250906636211200,
+              "endTimeUnixNano": 1790250906636218880,
+              "attributes": {
+                "isaac.request_id": "slice-b-opt",
+                "service.name": "isaac-cognitive-kernel"
+              },
+              "events": []
+            },
+            {
+              "traceId": "slice-b-opt",
+              "spanId": "classification-slice-b-opt",
+              "parentSpanId": "root-slice-b-opt",
+              "name": "isaac.classify",
+              "kind": "INTERNAL",
+              "startTimeUnixNano": 1790250906636211200,
+              "endTimeUnixNano": 1790250906636211200,
+              "attributes": {
+                "isaac.phase": "classification"
+              },
+              "events": [
+                {
+                  "timeUnixNano": 1790250906636211200,
+                  "name": "classified",
+                  "attributes": {
+                    "class": "NORMAL_CHAT"
+                  }
+                }
+              ]
+            },
+            {
+              "traceId": "slice-b-opt",
+              "spanId": "execution-slice-b-opt",
+              "parentSpanId": "root-slice-b-opt",
+              "name": "gen_ai.chat",
+              "kind": "INTERNAL",
+              "startTimeUnixNano": 1790250906636218880,
+              "endTimeUnixNano": 1790250906636218880,
+              "attributes": {
+                "isaac.phase": "execution",
+                "gen_ai.system": "groq",
+                "gen_ai.request.model": "llama-test",
+                "gen_ai.response.model": "llama-test",
+                "provider": "groq",
+                "model": "llama-test",
+                "latency_ms": 12.5
+              },
+              "events": [
+                {
+                  "timeUnixNano": 1790250906636218880,
+                  "name": "model_call",
+                  "attributes": {
+                    "provider": "groq",
+                    "model": "llama-test",
+                    "iteration": 0,
+                    "prompt_chars": 40,
+                    "response_chars": 20,
+                    "ok": true,
+                    "latency_ms": 12.5,
+                    "model_call_ms": 12.5,
+                    "input_tokens": "[REDACTED]",
+                    "output_tokens": "[REDACTED]",
+                    "total_tokens": "[REDACTED]",
+                    "gen_ai.system": "groq",
+                    "gen_ai.request.model": "llama-test",
+                    "gen_ai.response.model": "llama-test",
+                    "gen_ai.usage.input_tokens": "[REDACTED]",
+                    "gen_ai.usage.output_tokens": "[REDACTED]",
+                    "gen_ai.usage.total_tokens": "[REDACTED]"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -17,9 +17,19 @@ except Exception:
     pass
 
 BASE_DIR = Path(__file__).parent
-DATA_DIR = BASE_DIR / "data"
-LOG_DIR = BASE_DIR / "logs"
-WORKSPACE = BASE_DIR / "workspace"
+
+# Vercel's deployment filesystem is read-only. Keep local behavior unchanged
+# while routing ephemeral serverless state to the writable /tmp tree.
+if os.getenv("VERCEL"):
+    RUNTIME_DIR = Path(os.getenv("TMPDIR", "/tmp")) / "isaac"
+    DATA_DIR = RUNTIME_DIR / "data"
+    LOG_DIR = RUNTIME_DIR / "logs"
+    WORKSPACE = RUNTIME_DIR / "workspace"
+else:
+    RUNTIME_DIR = BASE_DIR
+    DATA_DIR = BASE_DIR / "data"
+    LOG_DIR = BASE_DIR / "logs"
+    WORKSPACE = BASE_DIR / "workspace"
 DB_PATH = DATA_DIR / "isaac.db"
 AUDIT_PATH = DATA_DIR / "audit.jsonl"
 RUNTIME_SETTINGS_PATH = DATA_DIR / "runtime_settings.json"
@@ -343,7 +353,7 @@ class BrowserConfig:
 
 @dataclass
 class MonitorConfig:
-    host: str = "localhost"
+    host: str = (os.getenv("ISAAC_BIND_HOST", "") or "").strip() or "localhost"
     port: int = int(os.getenv("MONITOR_PORT", "8765"))
     http_port: int = int(os.getenv("DASHBOARD_PORT", "8766"))
     push_interval: float = 0.5

@@ -8,6 +8,7 @@ Fixes:
   - Watchdog-Status in Metriken
   - _on_task_update und _on_audit_event laufen sicher im Loop
 """
+from __future__ import annotations
 
 import asyncio
 import json

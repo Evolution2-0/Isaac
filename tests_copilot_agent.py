@@ -16,14 +16,14 @@ class TestCopilotConfig(unittest.TestCase):
             {
                 "ISAAC_COPILOT_AGENT_ENABLED": "1",
                 "ISAAC_COPILOT_AGENT_ALWAYS_APPROVE": "0",
-                "ISAAC_COPILOT_CLOUD_REPO": "glinkasteffen075-bit/Isaac",
+                "ISAAC_COPILOT_CLOUD_REPO": "hansheute88/isaac",
             },
             clear=False,
         ):
             reset_external_memory_bridge()
             cfg = load_external_memory_config()
             self.assertTrue(cfg.copilot_agent_enabled)
-            self.assertEqual(cfg.copilot_cloud_repo, "glinkasteffen075-bit/Isaac")
+            self.assertEqual(cfg.copilot_cloud_repo, "hansheute88/isaac")
             self.assertIn("copilot", cfg.copilot_agent_bin or "copilot")
 
 

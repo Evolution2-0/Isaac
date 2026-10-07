@@ -1,6 +1,6 @@
 # Render Blueprint — Isaac free (zero billing)
 # https://dashboard.render.com → New → Blueprint
-# Repo: sc0rp0815/Isaac (preferred) | legacy: sco0rp/IsaacNew  |  Branch: main
+# Repo: hansheute88/isaac (preferred) | legacy: sc0rp0815/Isaac |  Branch: main
 #
 # Nach dem Deploy: Environment → GROQ_API_KEY setzen (Secret)
 

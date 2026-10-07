@@ -235,7 +235,7 @@ class Mem0Adapter:
         headers = {
             "Authorization": f"Token {api_key}",
             "Accept": "application/json",
-            "User-Agent": "Isaac-Mem0Adapter/5.3 (+https://github.com/sc0rp0815/Isaac)",
+            "User-Agent": "Isaac-Mem0Adapter/5.3 (+https://github.com/hansheute88/isaac)",
         }
         if body is not None:
             data = json.dumps(body).encode("utf-8")

@@ -14,6 +14,7 @@ Zwei Aufgaben:
    Erholt sich automatisch nach Cooldown-Zeit.
    Bevorzugt zuverlässige Provider in der Fallback-Kette.
 """
+from __future__ import annotations
 
 import asyncio
 import time

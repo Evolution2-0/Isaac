@@ -29,7 +29,7 @@ So geht's:
   1) Termux-App auf dem Handy öffnen
   2) Falls Isaac dort noch fehlt:
        pkg install git
-       git clone https://github.com/glinkasteffen075-bit/Isaac.git ~/Isaac
+       git clone https://github.com/hansheute88/isaac.git ~/Isaac
      Oder nur das Skript kopieren:
        mkdir -p ~/isaacnew/scripts
        cp /pfad/zum/setup_termux_bridge.sh ~/isaacnew/scripts/

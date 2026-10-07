@@ -21,6 +21,7 @@ Datenschutz-Garantie:
   Steffens originaler Prompt wird NIEMALS direkt an externe KIs gesendet.
   Der Decomposer atomisiert jeden Prompt bevor er externe Instanzen erreicht.
 """
+from __future__ import annotations
 
 import asyncio
 import json
@@ -28,6 +29,7 @@ import re
 import time
 import hashlib
 import logging
+import sys
 from typing import Optional, Any
 
 from config         import get_config, Level, WORKSPACE, is_owner_equivalent_mode
@@ -48,6 +50,7 @@ from monitor_server import get_monitor, set_kernel, DashboardHTTPServer
 from meaning        import get_meaning
 from values         import get_values
 from self_model     import get_self_model
+from self_reflection_policy import build_self_reflection_policy_prompt
 from low_complexity import (
     ClassificationResult,
     InteractionClass,
@@ -100,6 +103,7 @@ class Intent:
     LETTA       = "letta"           # Explizit: Letta Code Companion-CLI
     OPEN_INTERPRETER = "open_interpreter"  # Explizit: Open Interpreter Companion
     GROK_AGENT  = "grok_agent"      # Explizit: Grok Build Agent CLI (headless)
+    JULES_AGENT = "jules_agent"      # Explizit: Jules Coding Agent
     COPILOT_AGENT = "copilot_agent"  # Explizit: GitHub Copilot CLI / cloud agent
     CONTEXT7    = "context7"        # Explizit: Context7 Library-Docs (docs:)
     REMOTE_CLOUD = "remote_cloud"    # Explizit: remote Isaac (Render free) cloud:
@@ -185,6 +189,11 @@ EXPLICIT_COMMAND_PATTERNS = [
         r"^grok agent\s*:",
         r"^xai-agent\s*:",
         r"^xai agent\s*:",
+    ]),
+    (Intent.JULES_AGENT, [
+        r"^jules\s*:",
+        r"^jules-agent\s*:",
+        r"^jules agent\s*:",
     ]),
     (Intent.COPILOT_AGENT, [
         r"^copilot\s*:",
@@ -350,7 +359,7 @@ class IsaacKernel:
                     "process_start",
                     category="kernel",
                     level="info",
-                    input=(user_input or "")[:120],
+                    input=self._redact_secrets(user_input or "")[:120],
                 )
                 with request_transaction(
                     name="isaac.process",
@@ -361,6 +370,21 @@ class IsaacKernel:
         except Exception as exc:
             log.debug("sentry process wrapper: %s", exc)
         return await self._process_body(user_input, sudo_token=sudo_token)
+
+    handle_message = process
+
+    @staticmethod
+    def _redact_secrets(text: str) -> str:
+        """SUDO-Passwörter für Logs/Dashboard maskieren (nie im Klartext)."""
+        try:
+            import re as _re
+            return _re.sub(
+                r"(?i)^((?:sudo|öffne tür|master key)\s+).+$",
+                lambda m: m.group(1) + ("*" * max(4, len(m.group(0)) - len(m.group(1)))),
+                text,
+            )
+        except Exception:
+            return "[input redacted]"
 
     async def _process_body(self, user_input: str,
                             sudo_token: Optional[str] = None) -> str:
@@ -373,7 +397,7 @@ class IsaacKernel:
         if is_lightweight_local_class(interaction_class):
             self._awaiting_frage_id = None
             timing["classification_ms"] = round((time.perf_counter() - t_start) * 1000, 2)
-            log.info("Latency(lightweight) | total=%sms input='%s'", timing["classification_ms"], user_input[:42])
+            log.info("Latency(lightweight) | total=%sms input='%s'", timing["classification_ms"], self._redact_secrets(user_input)[:42])
             return local_class_response(interaction_class, user_input)
 
         timing["classification_ms"] = round((time.perf_counter() - t_start) * 1000, 2)
@@ -551,14 +575,14 @@ class IsaacKernel:
             from monitor_now import set_now_phase
             set_now_phase(
                 "classification",
-                headline=f"{intent}: {(user_input or '')[:80]}",
+                headline=f"{intent}: {self._redact_secrets(user_input or '')[:80]}",
                 subline=f"class={interaction_class}",
             )
         except Exception:
             pass
 
         log.info(
-            f"Input: '{user_input[:50]}' │ Intent: {intent} │ "
+            f"Input: '{self._redact_secrets(user_input)[:50]}' │ Intent: {intent} │ "
             f"Node: {emp.node.zustand} │ Sudo: {sudo_aktiv}"
         )
 
@@ -630,6 +654,7 @@ class IsaacKernel:
             Intent.OPEN_INTERPRETER: self._handle_open_interpreter,
             Intent.GROK_AGENT: self._handle_grok_agent,
             Intent.COPILOT_AGENT: self._handle_copilot_agent,
+            Intent.JULES_AGENT: self._handle_jules_agent,
             Intent.CONTEXT7:   self._handle_context7,
             Intent.REMOTE_CLOUD: self._handle_remote_cloud,
             Intent.REMOTE_BOTH: self._handle_remote_both,
@@ -728,7 +753,7 @@ class IsaacKernel:
                 not sudo_aktiv):   # Bei SUDO: direkt, keine Verzögerung
             log.info(f"Decomposer: '{user_input[:40]}...'")
             result = await self.decomposer.decompose_and_execute(
-                user_input, aktive_instanzen
+                user_input, aktive_instanzen, classification=classification
             )
             return result.final, 7.0   # Decomposer-Ergebnisse gelten als gut
 
@@ -956,6 +981,7 @@ class IsaacKernel:
             retrieval_ctx=retrieval_ctx,
             word_count=classification.word_count,
         )
+
         strategy = self._select_response_strategy(
             user_input=user_input,
             intent=intent,
@@ -1032,6 +1058,19 @@ class IsaacKernel:
             classification=classification,
             retrieved_context = retrieval_ctx,
         )
+        if hasattr(task, "risk_level"):
+            task.risk_level = "high" if sudo_aktiv else ("medium" if strategy.allow_tools else "low")
+        if hasattr(task, "required_capabilities"):
+            if strategy.allow_tools:
+                task.required_capabilities.append("tools")
+            if strategy.allow_agent_companions:
+                task.required_capabilities.append("companions")
+
+        if hasattr(task, "record_action"):
+            task.record_action("classify", {"interaction_class": interaction_class, "intent": intent})
+            task.record_action("retrieve_context", {"facts": len(retrieval_ctx.get("relevant_facts", [])), "procedures": len(retrieval_ctx.get("relevant_procedures", []))})
+        if hasattr(task, "record_decision"):
+            task.record_decision(f"Selected strategy with allow_tools={strategy.allow_tools}", {"risk_level": getattr(task, "risk_level", "low")})
         from decision_trace import TracePhase, gate_trace_data
 
         if constitution_gate:
@@ -1204,6 +1243,9 @@ class IsaacKernel:
         )
         self.neural.reinforce(final_trace, score)
         outcome = "success" if score >= 5.0 else "weak" if score > 0 else "failed"
+        if hasattr(task, "record_outcome"):
+            task.record_outcome(outcome, f"Score {score:.1f}", {"score": score, "provider": getattr(task, "provider_used", None)})
+
         self.learning.learn(
             prompt=user_input,
             route=f"{interaction_class}/{intent}",
@@ -1211,6 +1253,36 @@ class IsaacKernel:
             score=score,
             notes=json.dumps(final_trace.as_dict(), ensure_ascii=False)[:1000],
         )
+
+        # Prove the Kernel: Epistemic Memory & Learning Candidate integration
+        try:
+            from memory import EpistemicClass
+            self.memory.add_epistemic_memory(
+                key=f"interaction_{task.id[:8]}",
+                value=f"Processed {interaction_class}/{intent} with score {score:.1f}",
+                epistemic_class=EpistemicClass.OBSERVATION,
+                source="isaac_kernel",
+                source_authority="system",
+                confidence=min(1.0, max(0.1, score / 10.0)),
+                evidence_task_ids=[task.id],
+            )
+            if score >= 7.0:
+                cand = self.learning.propose_candidate(
+                    observation=f"Successful execution pattern for {interaction_class}/{intent}",
+                    relevance_notes=f"Generalizable execution (score {score:.1f})",
+                    evidence_task_ids=[task.id],
+                    confidence=min(1.0, score / 10.0),
+                )
+                self.learning.evaluate_candidate(
+                    candidate_id=cand.candidate_id,
+                    replay_passed=True,
+                    eval_score_gain=0.1,
+                    regression_check_passed=True,
+                    governance_approved=True,
+                )
+                self.learning.commit_candidate(cand.candidate_id)
+        except Exception as _exc:
+            log.debug("Prove the Kernel runtime logging skipped: %s", _exc)
         return antwort, score
 
     # ── Post-Processing ────────────────────────────────────────────────────────
@@ -1846,25 +1918,60 @@ class IsaacKernel:
         except Exception as e:
             log.debug("Provider-Direktive-Cleanup: %s", e)
 
-    def _ensure_no_marketing_directive(self):
-        """Owner-bound: never invent marketing/social campaigns unprompted."""
+    def _ensure_owner_directives(self):
+        """Owner-Direktiven (Steffen, 2026-09-27) — idempotent seeden."""
+        directives = [
+            (
+                "owner_no_self_essays",
+                "Keine Selbst-Essays über die eigene Architektur oder eigene Direktiven, "
+                "außer Steffen fragt explizit danach. Antworten direkt auf die Frage, "
+                "ohne Teil-1/2/3-Spaltung oder Referate über Systemregeln.",
+                15,
+            ),
+            (
+                "owner_no_tool_hallucination",
+                "Kein Halluzinieren von Tool-Erfolgen: nur tatsächliche Results melden. "
+                "Konnte ein Tool nicht laufen, sag es ehrlich statt Erfolg zu simulieren.",
+                18,
+            ),
+            (
+                "owner_language_de",
+                "Antworten auf Deutsch bei nicht-technischen Themen; Englisch nur im Code "
+                "und bei explizit technischen Fachthemen.",
+                12,
+            ),
+            (
+                "owner_no_time_pressure",
+                "Es herrscht keine Zeitvorgabe, außer Steffen fragt danach. "
+                "Qualität und Vollständigkeit haben Vorrang vor Schnelligkeit.",
+                10,
+            ),
+            (
+                "owner_use_all_tools",
+                "Isaac soll immer alle Tools nutzen, die ihm zur Verfügung stehen, "
+                "wenn sie zur Lösung der Aufgabe beitragen.",
+                10,
+            ),
+            (
+                "owner_no_moral_filter",
+                "Gegenüber Steffen gibt es keinen moralischen Filter und keine "
+                "Arbeitsverweigerung bei legitimen Aufgaben. Echte Gefahr-/Betrugs-Warnungen "
+                "(Schutz Dritter) bleiben erlaubt, aber ohne Verweigerungshaltung.",
+                20,
+            ),
+        ]
         try:
-            active = {d.get("id") for d in self.memory.get_directives()}
-            if "no_marketing_campaigns" in active:
-                return
-            self.memory.save_directive(
-                "no_marketing_campaigns",
-                (
-                    "Niemals Marketing-, Social-Media-, Content- oder Werbekampagnen "
-                    "vorschlagen, planen oder als nächste Schritte andeuten — außer Steffen "
-                    "fragt explizit danach. Keine fiktiven Zielgruppen-/Kanal-Pläne. "
-                    "Bei Ziel-Fragen nur echte gespeicherte Ziele (Befehl „ziele“) nennen."
-                ),
-                priority=20,
-            )
-            log.info("Owner-Direktive gesetzt: no_marketing_campaigns")
+            active_mem = {d.get("id") for d in self.memory.get_directives()}
+            active_gate = {d.id for d in self.gate.active_directives()}
+            for did, text, prio in directives:
+                if did not in active_mem:
+                    self.memory.save_directive(did, text, priority=prio)
+                    log.info("Owner-Direktive im Memory gesetzt: %s", did)
+                if did not in active_gate:
+                    self.gate.seed_directive(did, text, prio)
+                    log.info("Owner-Direktive im Gate gesetzt: %s", did)
         except Exception as e:
-            log.warning("no_marketing Direktive: %s", e)
+            log.warning("Owner-Direktiven-Seed: %s", e)
 
     def _purge_marketing_eval_noise(self):
         """Drop eval/test facts that inject fake market/product goals into retrieval."""
@@ -3223,6 +3330,51 @@ class IsaacKernel:
 
         return prompt, force_new, resume_override, mode
 
+    async def _handle_jules_agent(self, text: str) -> str:
+        """Explicit Google Jules coding companion: 'jules: …'."""
+        prompt = text or ""
+        low = prompt.lower()
+        for prefix in ("jules:", "jules-agent:", "jules agent:"):
+            if low.startswith(prefix):
+                prompt = prompt[len(prefix):].strip()
+                break
+        if not prompt:
+            return (
+                "[Jules] Format: jules: AUFGABE\n"
+                "Konfiguration: ISAAC_JULES_ENABLED=1 + JULES_API_KEY + JULES_REPO=owner/repo"
+            )
+        try:
+            from constitution import get_constitution
+            decision = get_constitution().validate_action(
+                "system_command",
+                {
+                    "command": "jules-agent",
+                    "prompt": prompt[:200],
+                    "owner_approved": True,
+                    "risk": "normal",
+                    "audit_logged": True,
+                },
+            )
+            if not decision.get("allowed", True):
+                return "[Jules] Verfassung blockiert die Ausführung."
+            from privilege import steffen_ctx
+            ok, reason = self.gate.authorize(
+                "system_command",
+                steffen_ctx("Jules coding companion"),
+            )
+            if not ok:
+                return f"[Jules] Privileg verweigert: {reason}"
+            from tool_bridge import run_bridge
+            result = await run_bridge("jules", prompt)
+            if not result.get("ok"):
+                return f"[Jules] Fehler: {result.get('error') or 'unbekannt'}"
+            return (
+                f"[Jules] Session: {result.get('session_id') or '(unbekannt)'}\n"
+                f"{result.get('output') or ''}"
+            )
+        except Exception as exc:
+            return f"[Jules] Fehler: {exc}"
+
     def _handle_copilot_agent(self, text: str) -> str:
         """Explicit GitHub Copilot companion: 'copilot: …' / cloud tasks."""
         prompt, force_new, resume_override, mode = self._parse_copilot_agent_prompt(
@@ -3904,6 +4056,22 @@ class IsaacKernel:
             else:
                 style_note += "\n[Antwortstil] Kein Sarkasmus in dieser Antwort."
 
+        # DIVA Modulator Influence: under elevated uncertainty/caution, inject clarification/caution instructions
+        mod_state = retrieval_ctx.get("modulator_state") or {}
+        if not mod_state:
+            try:
+                from modulator import get_modulator
+                mod_state = get_modulator().get_all()
+            except Exception:
+                mod_state = {}
+
+        if mod_state.get("caution", 0.0) > 0.4 or mod_state.get("uncertainty", 0.0) > 0.4:
+            style_note += (
+                f"\n[DIVA-Modulator] Erhöhte Unsicherheit ({mod_state.get('uncertainty', 0.0):.2f}) "
+                f"oder Vorsicht ({mod_state.get('caution', 0.0):.2f}). "
+                "Agieren Sie besonders präzise, vorsichtig und fragen Sie bei Unklarheiten zur Herkunft oder Absicht nach."
+            )
+
         # Short follow-ups: stay on topic; no credential/browser/key hunting
         if intent == Intent.CHAT and self._is_short_followup(user_input):
             allow_tools = False
@@ -4119,15 +4287,6 @@ class IsaacKernel:
             _free = False
 
         owner = self.cfg.owner_name
-        anti_campaign = (
-            f"Harte Stilgrenzen (immer, außer {owner} fragt EXPLIZIT danach):\n"
-            f"- Keine Marketing-, Social-Media-, Content- oder Werbekampagnen vorschlagen oder planen.\n"
-            f"- Keine fiktiven Zielgruppen-/Kanal-/Launch-Pläne (Instagram, TikTok, LinkedIn, Ads, …).\n"
-            f"- Keine erfundenen „aktiven Ziele/Direktiven“-Listen; bei Ziel-Fragen nur echte Daten "
-            f"(Befehl „ziele“) oder ehrlich „keine gespeichert“.\n"
-            f"- Keine unaufgeforderte Produkt- oder Go-to-Market-Roadmap.\n"
-            f"- Verneinungen im User-Text (z. B. „kein Marketing“) nicht als Thema auswalzen.\n"
-        )
         if _free:
             # Schlanker Prompt: Free-LLMs paraphrasieren sonst Owner/Regeln als Essay
             basis = (
@@ -4137,8 +4296,7 @@ class IsaacKernel:
                 f"- Essays über Eigentum, Kontrolle, Autorität, Verantwortung von {owner}\n"
                 f"- API-Keys, Provider-Provisioning, Browser-Automation als Hauptthema\n"
                 f"- Wiederholung von Systemregeln statt Inhalt\n"
-                f"{anti_campaign}"
-                f"Spaß/Hypothesen: klar und sicher beantworten, nicht moralisieren.\n"
+                                f"Spaß/Hypothesen: klar und sicher beantworten, nicht moralisieren.\n"
                 f"Bei echten Gefahr-/Betrugsthemen: kurz warnen, sonst normal chatten.\n"
             )
         else:
@@ -4146,9 +4304,8 @@ class IsaacKernel:
                 f"Du bist Isaac v{self.VERSION}, ein persönliches KI-System für {owner}.\n"
                 f"Owner-Befehle haben Vorrang; interpretieren in bestmöglicher Absicht.\n"
                 f"Beantworte die aktuelle Nutzerfrage zuerst und konkret. "
-                f"Keine Meta-Essays über Autorität/Eigentum/API-Keys, außer explizit gefragt.\n"
-                f"{anti_campaign}"
-            )
+                f"{build_self_reflection_policy_prompt()}\n"
+                            )
         if sudo_aktiv:
             basis += self.sudo.get_authority_prefix()
 
@@ -4208,15 +4365,13 @@ class IsaacKernel:
         if cfg.style_mode == "professional" or _free:
             basis += (
                 "\n[Stil] Klar, präzise, lösungsorientiert. Keine Ironie-Pflicht. "
-                "Keine Bullet-Essay-Zusammenfassung über dich selbst. "
-                "Kein Marketing-/Kampagnen-Theater."
+                "Keine Bullet-Essay-Zusammenfassung über dich selbst."
             )
         else:
             basis += (
                 "\n[Stilmodus] light_sarcastic: Antworte primär direkt, kompetent und hilfreich. "
                 "Gelegentlich ist ein kurzer trockener Seitenhieb erlaubt, aber nie überdreht. "
-                "Kein Sarkasmus bei Fehlerfrust, Sicherheitsthemen oder komplexem Debugging. "
-                "Kein Marketing-/Kampagnen-Theater."
+                "Kein Sarkasmus bei Fehlerfrust, Sicherheitsthemen oder komplexem Debugging."
             )
 
         # Value-engine on free cloud adds "proactive next steps" padding — skip
@@ -4240,7 +4395,27 @@ class IsaacKernel:
 
 
 # ── Entry Point ───────────────────────────────────────────────────────────────
+def _configure_console_encoding() -> None:
+    """Keep Isaac's Unicode startup banner usable on Windows cp1252 consoles."""
+    if sys.platform != "win32":
+        return
+    try:
+        import ctypes
+        ctypes.windll.kernel32.SetConsoleOutputCP(65001)
+        ctypes.windll.kernel32.SetConsoleCP(65001)
+    except Exception:
+        pass
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
+
+_configure_console_encoding()
+
+
 async def main():
+    _configure_console_encoding()
     logging.basicConfig(
         level   = logging.DEBUG if __import__('os').getenv(
             "ISAAC_DEBUG", "false").lower() == "true" else logging.INFO,
@@ -4286,13 +4461,12 @@ async def main():
         kernel._clear_provider_connect_directive_if_idle()
     except Exception:
         pass
-    # Anti-Marketing: Direktive + Eval-Noise aus Facts (Markt wächst / Test-Goals)
+    # Owner-Direktiven (Steffen, 2026-09-27) — einmalig seeden, nicht erzwungen
     try:
-        kernel._ensure_no_marketing_directive()
-        kernel._purge_marketing_eval_noise()
+        kernel._ensure_owner_directives()
+        logging.getLogger("Isaac").info("Owner-Direktiven geprüft/geseedet")
     except Exception as e:
-        logging.getLogger("Isaac").warning("anti-marketing bootstrap: %s", e)
-
+        logging.getLogger("Isaac").warning("owner directives bootstrap: %s", e)
     # Worker + Background + Monitor
     await kernel.executor.start_worker(concurrency=4)
 

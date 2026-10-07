@@ -16,7 +16,7 @@ Bitte zuerst auf dem Handy:
   2) Termux öffnen und einmal starten
   3) Dann in Termux:
        pkg install git
-       git clone https://github.com/glinkasteffen075-bit/Isaac.git ~/Isaac
+       git clone https://github.com/hansheute88/isaac.git ~/Isaac
        bash ~/Isaac/scripts/setup_termux_bridge.sh
 
 Isaac im Chroot (/root/isaacnew) und Termux (~/Isaac) können getrennte Kopien sein —

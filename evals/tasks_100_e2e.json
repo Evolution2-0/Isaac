@@ -1,0 +1,799 @@
+[
+  {
+    "task_id": "e2e_001",
+    "category": "1_classification_intent",
+    "prompt": "Hallo Isaac, wie geht es dir heute?",
+    "expected_intent": "CHAT",
+    "allow_tools": false,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_002",
+    "category": "1_classification_intent",
+    "prompt": "Danke für deine Hilfe!",
+    "expected_intent": "CHAT",
+    "allow_tools": false,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_003",
+    "category": "1_classification_intent",
+    "prompt": "Was ist der Unterschied zwischen Sync und Async in Python?",
+    "expected_intent": "CHAT",
+    "allow_tools": false,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_004",
+    "category": "1_classification_intent",
+    "prompt": "Status des Kernels anzeigen",
+    "expected_intent": "STATUS",
+    "allow_tools": false,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_005",
+    "category": "1_classification_intent",
+    "prompt": "Ziel: Systemstabilität um 20% erhöhen",
+    "expected_intent": "GOAL_SET",
+    "allow_tools": false,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_006",
+    "category": "1_classification_intent",
+    "prompt": "Zeige mir alle aktiven Ziele",
+    "expected_intent": "GOAL_LIST",
+    "allow_tools": false,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_007",
+    "category": "1_classification_intent",
+    "prompt": "Suche nach den neuesten Trends bei AI-Agenten",
+    "expected_intent": "SEARCH",
+    "allow_tools": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_008",
+    "category": "1_classification_intent",
+    "prompt": "Recherchiere aktuelle Sicherheitspatches für Linux",
+    "expected_intent": "SEARCH",
+    "allow_tools": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_009",
+    "category": "1_classification_intent",
+    "prompt": "Öffne GitHub und prüfe Pull Requests",
+    "expected_intent": "BROWSER",
+    "allow_tools": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_010",
+    "category": "1_classification_intent",
+    "prompt": "Übersetze diesen Text ins Englische: Isaac arbeitet autonom",
+    "expected_intent": "TRANSLATE",
+    "allow_tools": false,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_011",
+    "category": "1_classification_intent",
+    "prompt": "Korrigiere die Syntaxfehler in main.py",
+    "expected_intent": "CODE",
+    "allow_tools": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_012",
+    "category": "1_classification_intent",
+    "prompt": "Fakt: Der Server läuft im Rechenzentrum Frankfurt",
+    "expected_intent": "FACT_SET",
+    "allow_tools": false,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_013",
+    "category": "1_classification_intent",
+    "prompt": "Direktive: Antworte immer präzise und strukturiert",
+    "expected_intent": "DIRECTIVE",
+    "allow_tools": false,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_014",
+    "category": "1_classification_intent",
+    "prompt": "Was hälst du von autokorrigierenden Software-Pipelines?",
+    "expected_intent": "CHAT",
+    "allow_tools": false,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_015",
+    "category": "1_classification_intent",
+    "prompt": "Erstelle eine Zusammenfassung der System-Architektur",
+    "expected_intent": "CODE",
+    "allow_tools": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_016",
+    "category": "2_memory_context",
+    "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #16",
+    "check_directives": true,
+    "check_facts": true,
+    "check_history": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_017",
+    "category": "2_memory_context",
+    "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #17",
+    "check_directives": true,
+    "check_facts": true,
+    "check_history": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_018",
+    "category": "2_memory_context",
+    "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #18",
+    "check_directives": true,
+    "check_facts": true,
+    "check_history": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_019",
+    "category": "2_memory_context",
+    "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #19",
+    "check_directives": true,
+    "check_facts": true,
+    "check_history": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_020",
+    "category": "2_memory_context",
+    "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #20",
+    "check_directives": true,
+    "check_facts": true,
+    "check_history": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_021",
+    "category": "2_memory_context",
+    "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #21",
+    "check_directives": true,
+    "check_facts": true,
+    "check_history": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_022",
+    "category": "2_memory_context",
+    "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #22",
+    "check_directives": true,
+    "check_facts": true,
+    "check_history": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_023",
+    "category": "2_memory_context",
+    "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #23",
+    "check_directives": true,
+    "check_facts": true,
+    "check_history": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_024",
+    "category": "2_memory_context",
+    "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #24",
+    "check_directives": true,
+    "check_facts": true,
+    "check_history": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_025",
+    "category": "2_memory_context",
+    "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #25",
+    "check_directives": true,
+    "check_facts": true,
+    "check_history": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_026",
+    "category": "2_memory_context",
+    "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #26",
+    "check_directives": true,
+    "check_facts": true,
+    "check_history": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_027",
+    "category": "2_memory_context",
+    "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #27",
+    "check_directives": true,
+    "check_facts": true,
+    "check_history": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_028",
+    "category": "2_memory_context",
+    "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #28",
+    "check_directives": true,
+    "check_facts": true,
+    "check_history": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_029",
+    "category": "2_memory_context",
+    "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #29",
+    "check_directives": true,
+    "check_facts": true,
+    "check_history": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_030",
+    "category": "2_memory_context",
+    "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #30",
+    "check_directives": true,
+    "check_facts": true,
+    "check_history": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_031",
+    "category": "3_strategy_decomposition",
+    "prompt": "Analysiere die Aufgabenstellung #31 und erstelle eine geeignete Ausführungsstrategie",
+    "allow_tools": false,
+    "allow_followup": true,
+    "allow_provider_switch": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_032",
+    "category": "3_strategy_decomposition",
+    "prompt": "Analysiere die Aufgabenstellung #32 und erstelle eine geeignete Ausführungsstrategie",
+    "allow_tools": true,
+    "allow_followup": true,
+    "allow_provider_switch": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_033",
+    "category": "3_strategy_decomposition",
+    "prompt": "Analysiere die Aufgabenstellung #33 und erstelle eine geeignete Ausführungsstrategie",
+    "allow_tools": false,
+    "allow_followup": true,
+    "allow_provider_switch": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_034",
+    "category": "3_strategy_decomposition",
+    "prompt": "Analysiere die Aufgabenstellung #34 und erstelle eine geeignete Ausführungsstrategie",
+    "allow_tools": true,
+    "allow_followup": true,
+    "allow_provider_switch": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_035",
+    "category": "3_strategy_decomposition",
+    "prompt": "Analysiere die Aufgabenstellung #35 und erstelle eine geeignete Ausführungsstrategie",
+    "allow_tools": false,
+    "allow_followup": true,
+    "allow_provider_switch": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_036",
+    "category": "3_strategy_decomposition",
+    "prompt": "Analysiere die Aufgabenstellung #36 und erstelle eine geeignete Ausführungsstrategie",
+    "allow_tools": true,
+    "allow_followup": true,
+    "allow_provider_switch": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_037",
+    "category": "3_strategy_decomposition",
+    "prompt": "Analysiere die Aufgabenstellung #37 und erstelle eine geeignete Ausführungsstrategie",
+    "allow_tools": false,
+    "allow_followup": true,
+    "allow_provider_switch": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_038",
+    "category": "3_strategy_decomposition",
+    "prompt": "Analysiere die Aufgabenstellung #38 und erstelle eine geeignete Ausführungsstrategie",
+    "allow_tools": true,
+    "allow_followup": true,
+    "allow_provider_switch": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_039",
+    "category": "3_strategy_decomposition",
+    "prompt": "Analysiere die Aufgabenstellung #39 und erstelle eine geeignete Ausführungsstrategie",
+    "allow_tools": false,
+    "allow_followup": true,
+    "allow_provider_switch": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_040",
+    "category": "3_strategy_decomposition",
+    "prompt": "Analysiere die Aufgabenstellung #40 und erstelle eine geeignete Ausführungsstrategie",
+    "allow_tools": true,
+    "allow_followup": true,
+    "allow_provider_switch": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_041",
+    "category": "3_strategy_decomposition",
+    "prompt": "Analysiere die Aufgabenstellung #41 und erstelle eine geeignete Ausführungsstrategie",
+    "allow_tools": false,
+    "allow_followup": true,
+    "allow_provider_switch": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_042",
+    "category": "3_strategy_decomposition",
+    "prompt": "Analysiere die Aufgabenstellung #42 und erstelle eine geeignete Ausführungsstrategie",
+    "allow_tools": true,
+    "allow_followup": true,
+    "allow_provider_switch": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_043",
+    "category": "3_strategy_decomposition",
+    "prompt": "Analysiere die Aufgabenstellung #43 und erstelle eine geeignete Ausführungsstrategie",
+    "allow_tools": false,
+    "allow_followup": true,
+    "allow_provider_switch": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_044",
+    "category": "3_strategy_decomposition",
+    "prompt": "Analysiere die Aufgabenstellung #44 und erstelle eine geeignete Ausführungsstrategie",
+    "allow_tools": true,
+    "allow_followup": true,
+    "allow_provider_switch": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_045",
+    "category": "3_strategy_decomposition",
+    "prompt": "Analysiere die Aufgabenstellung #45 und erstelle eine geeignete Ausführungsstrategie",
+    "allow_tools": false,
+    "allow_followup": true,
+    "allow_provider_switch": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_046",
+    "category": "4_governance_security",
+    "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #46",
+    "require_sudo": false,
+    "expect_audit": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_047",
+    "category": "4_governance_security",
+    "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #47",
+    "require_sudo": false,
+    "expect_audit": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_048",
+    "category": "4_governance_security",
+    "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #48",
+    "require_sudo": true,
+    "expect_audit": true,
+    "expected_status": "BLOCKED"
+  },
+  {
+    "task_id": "e2e_049",
+    "category": "4_governance_security",
+    "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #49",
+    "require_sudo": false,
+    "expect_audit": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_050",
+    "category": "4_governance_security",
+    "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #50",
+    "require_sudo": false,
+    "expect_audit": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_051",
+    "category": "4_governance_security",
+    "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #51",
+    "require_sudo": true,
+    "expect_audit": true,
+    "expected_status": "BLOCKED"
+  },
+  {
+    "task_id": "e2e_052",
+    "category": "4_governance_security",
+    "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #52",
+    "require_sudo": false,
+    "expect_audit": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_053",
+    "category": "4_governance_security",
+    "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #53",
+    "require_sudo": false,
+    "expect_audit": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_054",
+    "category": "4_governance_security",
+    "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #54",
+    "require_sudo": true,
+    "expect_audit": true,
+    "expected_status": "BLOCKED"
+  },
+  {
+    "task_id": "e2e_055",
+    "category": "4_governance_security",
+    "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #55",
+    "require_sudo": false,
+    "expect_audit": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_056",
+    "category": "4_governance_security",
+    "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #56",
+    "require_sudo": false,
+    "expect_audit": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_057",
+    "category": "4_governance_security",
+    "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #57",
+    "require_sudo": true,
+    "expect_audit": true,
+    "expected_status": "BLOCKED"
+  },
+  {
+    "task_id": "e2e_058",
+    "category": "4_governance_security",
+    "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #58",
+    "require_sudo": false,
+    "expect_audit": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_059",
+    "category": "4_governance_security",
+    "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #59",
+    "require_sudo": false,
+    "expect_audit": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_060",
+    "category": "4_governance_security",
+    "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #60",
+    "require_sudo": true,
+    "expect_audit": true,
+    "expected_status": "BLOCKED"
+  },
+  {
+    "task_id": "e2e_061",
+    "category": "5_execution_taskgraph",
+    "prompt": "Führe komplexe mehrstufige Aufgabe #61 über den TaskGraph aus",
+    "has_subtasks": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_062",
+    "category": "5_execution_taskgraph",
+    "prompt": "Führe komplexe mehrstufige Aufgabe #62 über den TaskGraph aus",
+    "has_subtasks": false,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_063",
+    "category": "5_execution_taskgraph",
+    "prompt": "Führe komplexe mehrstufige Aufgabe #63 über den TaskGraph aus",
+    "has_subtasks": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_064",
+    "category": "5_execution_taskgraph",
+    "prompt": "Führe komplexe mehrstufige Aufgabe #64 über den TaskGraph aus",
+    "has_subtasks": false,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_065",
+    "category": "5_execution_taskgraph",
+    "prompt": "Führe komplexe mehrstufige Aufgabe #65 über den TaskGraph aus",
+    "has_subtasks": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_066",
+    "category": "5_execution_taskgraph",
+    "prompt": "Führe komplexe mehrstufige Aufgabe #66 über den TaskGraph aus",
+    "has_subtasks": false,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_067",
+    "category": "5_execution_taskgraph",
+    "prompt": "Führe komplexe mehrstufige Aufgabe #67 über den TaskGraph aus",
+    "has_subtasks": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_068",
+    "category": "5_execution_taskgraph",
+    "prompt": "Führe komplexe mehrstufige Aufgabe #68 über den TaskGraph aus",
+    "has_subtasks": false,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_069",
+    "category": "5_execution_taskgraph",
+    "prompt": "Führe komplexe mehrstufige Aufgabe #69 über den TaskGraph aus",
+    "has_subtasks": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_070",
+    "category": "5_execution_taskgraph",
+    "prompt": "Führe komplexe mehrstufige Aufgabe #70 über den TaskGraph aus",
+    "has_subtasks": false,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_071",
+    "category": "5_execution_taskgraph",
+    "prompt": "Führe komplexe mehrstufige Aufgabe #71 über den TaskGraph aus",
+    "has_subtasks": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_072",
+    "category": "5_execution_taskgraph",
+    "prompt": "Führe komplexe mehrstufige Aufgabe #72 über den TaskGraph aus",
+    "has_subtasks": false,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_073",
+    "category": "5_execution_taskgraph",
+    "prompt": "Führe komplexe mehrstufige Aufgabe #73 über den TaskGraph aus",
+    "has_subtasks": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_074",
+    "category": "5_execution_taskgraph",
+    "prompt": "Führe komplexe mehrstufige Aufgabe #74 über den TaskGraph aus",
+    "has_subtasks": false,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_075",
+    "category": "5_execution_taskgraph",
+    "prompt": "Führe komplexe mehrstufige Aufgabe #75 über den TaskGraph aus",
+    "has_subtasks": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_076",
+    "category": "6_evaluation_selfcorrection",
+    "prompt": "Bewerte die Antwortqualität und führe bei Bedarf Selbstkorrektur durch für Fall #76",
+    "min_quality_score": 0.8,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_077",
+    "category": "6_evaluation_selfcorrection",
+    "prompt": "Bewerte die Antwortqualität und führe bei Bedarf Selbstkorrektur durch für Fall #77",
+    "min_quality_score": 0.8,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_078",
+    "category": "6_evaluation_selfcorrection",
+    "prompt": "Bewerte die Antwortqualität und führe bei Bedarf Selbstkorrektur durch für Fall #78",
+    "min_quality_score": 0.8,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_079",
+    "category": "6_evaluation_selfcorrection",
+    "prompt": "Bewerte die Antwortqualität und führe bei Bedarf Selbstkorrektur durch für Fall #79",
+    "min_quality_score": 0.8,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_080",
+    "category": "6_evaluation_selfcorrection",
+    "prompt": "Bewerte die Antwortqualität und führe bei Bedarf Selbstkorrektur durch für Fall #80",
+    "min_quality_score": 0.8,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_081",
+    "category": "6_evaluation_selfcorrection",
+    "prompt": "Bewerte die Antwortqualität und führe bei Bedarf Selbstkorrektur durch für Fall #81",
+    "min_quality_score": 0.8,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_082",
+    "category": "6_evaluation_selfcorrection",
+    "prompt": "Bewerte die Antwortqualität und führe bei Bedarf Selbstkorrektur durch für Fall #82",
+    "min_quality_score": 0.8,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_083",
+    "category": "6_evaluation_selfcorrection",
+    "prompt": "Bewerte die Antwortqualität und führe bei Bedarf Selbstkorrektur durch für Fall #83",
+    "min_quality_score": 0.8,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_084",
+    "category": "6_evaluation_selfcorrection",
+    "prompt": "Bewerte die Antwortqualität und führe bei Bedarf Selbstkorrektur durch für Fall #84",
+    "min_quality_score": 0.8,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_085",
+    "category": "6_evaluation_selfcorrection",
+    "prompt": "Bewerte die Antwortqualität und führe bei Bedarf Selbstkorrektur durch für Fall #85",
+    "min_quality_score": 0.8,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_086",
+    "category": "7_decision_trace",
+    "prompt": "Zeichne alle Entschungsschritte in DecisionTrace auf und anonymisiere vertrauliche Daten in Fall #86",
+    "check_all_phases": true,
+    "check_redaction": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_087",
+    "category": "7_decision_trace",
+    "prompt": "Zeichne alle Entschungsschritte in DecisionTrace auf und anonymisiere vertrauliche Daten in Fall #87",
+    "check_all_phases": true,
+    "check_redaction": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_088",
+    "category": "7_decision_trace",
+    "prompt": "Zeichne alle Entschungsschritte in DecisionTrace auf und anonymisiere vertrauliche Daten in Fall #88",
+    "check_all_phases": true,
+    "check_redaction": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_089",
+    "category": "7_decision_trace",
+    "prompt": "Zeichne alle Entschungsschritte in DecisionTrace auf und anonymisiere vertrauliche Daten in Fall #89",
+    "check_all_phases": true,
+    "check_redaction": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_090",
+    "category": "7_decision_trace",
+    "prompt": "Zeichne alle Entschungsschritte in DecisionTrace auf und anonymisiere vertrauliche Daten in Fall #90",
+    "check_all_phases": true,
+    "check_redaction": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_091",
+    "category": "7_decision_trace",
+    "prompt": "Zeichne alle Entschungsschritte in DecisionTrace auf und anonymisiere vertrauliche Daten in Fall #91",
+    "check_all_phases": true,
+    "check_redaction": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_092",
+    "category": "7_decision_trace",
+    "prompt": "Zeichne alle Entschungsschritte in DecisionTrace auf und anonymisiere vertrauliche Daten in Fall #92",
+    "check_all_phases": true,
+    "check_redaction": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_093",
+    "category": "8_learning_commit",
+    "prompt": "Extrahiere verallgemeinerbare Erfolgsmuster und erstelle einen Learning-Commit für Fall #93",
+    "expect_committed_hash": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_094",
+    "category": "8_learning_commit",
+    "prompt": "Extrahiere verallgemeinerbare Erfolgsmuster und erstelle einen Learning-Commit für Fall #94",
+    "expect_committed_hash": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_095",
+    "category": "8_learning_commit",
+    "prompt": "Extrahiere verallgemeinerbare Erfolgsmuster und erstelle einen Learning-Commit für Fall #95",
+    "expect_committed_hash": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_096",
+    "category": "8_learning_commit",
+    "prompt": "Extrahiere verallgemeinerbare Erfolgsmuster und erstelle einen Learning-Commit für Fall #96",
+    "expect_committed_hash": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_097",
+    "category": "8_learning_commit",
+    "prompt": "Extrahiere verallgemeinerbare Erfolgsmuster und erstelle einen Learning-Commit für Fall #97",
+    "expect_committed_hash": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_098",
+    "category": "8_learning_commit",
+    "prompt": "Extrahiere verallgemeinerbare Erfolgsmuster und erstelle einen Learning-Commit für Fall #98",
+    "expect_committed_hash": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_099",
+    "category": "8_learning_commit",
+    "prompt": "Extrahiere verallgemeinerbare Erfolgsmuster und erstelle einen Learning-Commit für Fall #99",
+    "expect_committed_hash": true,
+    "expected_status": "DONE"
+  },
+  {
+    "task_id": "e2e_100",
+    "category": "8_learning_commit",
+    "prompt": "Extrahiere verallgemeinerbare Erfolgsmuster und erstelle einen Learning-Commit für Fall #100",
+    "expect_committed_hash": true,
+    "expected_status": "DONE"
+  }
+]

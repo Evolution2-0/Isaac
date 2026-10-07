@@ -3,7 +3,7 @@
 # Installiert Isaac mit Admin-Modus und optional SSH für Fernzugriff vom iPhone.
 #
 # Direkt in Termux:
-#   curl -sL https://raw.githubusercontent.com/glinkasteffen075-bit/Isaac/feature/phase-3-refine/android_remote_setup.sh | bash -s admin
+#   curl -sL https://raw.githubusercontent.com/hansheute88/isaac/feature/phase-3-refine/android_remote_setup.sh | bash -s admin
 #
 # Oder lokal:
 #   bash android_remote_setup.sh admin
@@ -13,7 +13,7 @@ set -euo pipefail
 MODE="${1:-admin}"
 OWNER="${ISAAC_OWNER:-Steffen}"
 ENABLE_SSH="${ENABLE_SSH:-1}"
-REPO_URL="${ISAAC_REPO_URL:-https://github.com/glinkasteffen075-bit/Isaac.git}"
+REPO_URL="${ISAAC_REPO_URL:-https://github.com/hansheute88/isaac.git}"
 ISAAC_DIR="${ISAAC_DIR:-$HOME/Isaac}"
 
 echo "╔══════════════════════════════════════════════════════╗"

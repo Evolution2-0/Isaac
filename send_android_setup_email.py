@@ -25,7 +25,7 @@ from email.mime.text import MIMEText
 from pathlib import Path
 
 DEFAULT_SCRIPT_URL = (
-    "https://raw.githubusercontent.com/glinkasteffen075-bit/Isaac/"
+    "https://raw.githubusercontent.com/hansheute88/isaac/"
     "feature/phase-3-refine/android_remote_setup.sh"
 )
 TERMUX_ONE_LINER = f"curl -sL {DEFAULT_SCRIPT_URL} | bash -s admin"

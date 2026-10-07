@@ -74,25 +74,26 @@ Erwartung auf deinem S8 (Linux-Root): `admin= True`, `runtime= s8`.
 
 ---
 
-## 4. Owner-Actions (Natursprache)
+## 4. Owner-Actions (Natursprache) & Autarke Root-Fähigkeiten
 
 Vollständige Befehlsliste: [OWNER_COMMANDS.md](OWNER_COMMANDS.md)
 
-| Kategorie | Status | Limit |
-|-----------|--------|-------|
-| Dateien (lesen/schreiben/kopieren/löschen) | ✅ | Cleanup schützt `.git`, `.env`, `isaac.db` |
-| Shell / Git / Pakete | ✅ | Admin: keine Shell-Fragment-Sperre |
-| WLAN / Router | ⚠️ | Plattform + gespeicherte Credentials |
-| Web / Browser / Maps | ⚠️ | `browser_automation` / Computer-Use nötig |
+| Kategorie | Status | Implementierung & Steuerung |
+|-----------|--------|-----------------------------|
+| Dateien (lesen/schreiben/kopieren/löschen) | ✅ | `file_access.py` & `owner_action.py` (Cleanup schützt `.git`, `.env`, `isaac.db`) |
+| Shell & Root-Befehle | ✅ | `computer_use.py` (Im Admin-Modus entfällt Shell-Fragment-Sperre) |
+| Apps & Pakete installieren | ✅ | `updater.py` & `owner_action.py` (`installiere paket ...`, `pip`, `apt`, `pkg`) |
+| Eigenen Code umschreiben (Self-Coding) | ✅ | `code_edit.py` (Aider SEARCH/REPLACE), `repo_map.py` & `git_ops.py` |
+| Web-Suche & Browser-Navigation | ✅ | `search.py` & `browser.py` (Playwright-Interaktion, Formulare, Scrape) |
+| Webseiten/Apps erstellen & servieren | ✅ | Local File Creation + HTTP/Dashboard Binding (`workspace/`, `web/`) |
+| WLAN / Router | ⚠️ | Plattform + gespeicherte Credentials (`owner_action.py`) |
 | Gmail / Kalender / Fotos | ⚠️ | Browser-Login des Owners nötig |
-| Telefon / SMS | ⚠️ | Android-Intents, nicht echter Telefonie-Stack |
-| Akku / Speicher / Prozesse | ✅ | |
-| Isaac-Ops (`isaac status`) | ✅ | |
-| Shopping / Medien / Wetter | ✅ | Öffnet URLs / Suche |
+| Akku / Speicher / Prozesse | ✅ | Native Shell & OS Metrics |
+| Isaac-Ops (`isaac status`) | ✅ | Kernel Control & Background Loops |
 
 ---
 
-## 5. Proaktive Autonomie (Background)
+## 5. Proaktive Autonomie & Selbst-Umschreiben (Autarkie)
 
 | Task | Standard | Konfiguration |
 |------|----------|---------------|

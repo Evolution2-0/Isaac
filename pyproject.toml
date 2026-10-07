@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "isaac"
+version = "5.4.0"
+description = "Isaac personal AI companion and cognitive kernel"
+requires-python = ">=3.12"
+dependencies = ["Flask>=3.0.0"]
+
+[project.scripts]
+isaac-flask = "app:main"
+
+[tool.vercel]
+entrypoint = "app:app"
+
+[tool.setuptools]
+py-modules = ["app"]

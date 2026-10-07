@@ -31,6 +31,7 @@ Regeln für KI-Dialoge:
   - Steffen-Kontext wird NICHT geteilt
   - Alle Gespräche landen im Audit-Log
 """
+from __future__ import annotations
 
 import asyncio
 import json

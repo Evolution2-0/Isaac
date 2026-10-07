@@ -30,6 +30,7 @@ Trust-Axiom (nicht verhandelbar):
    bestmögliche Absicht interpretiert. Bei scheinbarem
    Widerspruch: eigene Regel hinterfragen, nicht Steffen.
 """
+from __future__ import annotations
 
 import json
 import time

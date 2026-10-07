@@ -63,6 +63,26 @@ BRIDGE_TOOLS: list[dict[str, Any]] = [
         "metadata": {"bridge": "copilot_agent"},
     },
     {
+        "tool_id": "bridge_browserbase",
+        "name": "browserbase",
+        "kind": "bridge",
+        "category": "browser",
+        "description": "Provision an optional managed Browserbase cloud browser session",
+        "priority": 88,
+        "trust": 72.0,
+        "metadata": {"bridge": "browserbase"},
+    },
+    {
+        "tool_id": "bridge_jules",
+        "name": "jules",
+        "kind": "bridge",
+        "category": "code",
+        "description": "Delegate an asynchronous coding task to Google Jules",
+        "priority": 87,
+        "trust": 74.0,
+        "metadata": {"bridge": "jules"},
+    },
+    {
         "tool_id": "bridge_isaac_cloud",
         "name": "isaac_cloud",
         "kind": "bridge",
@@ -141,6 +161,10 @@ async def run_bridge(bridge_id: str, prompt: str) -> dict[str, Any]:
         return await _bridge_grok_agent(prompt)
     if bid in {"copilot_agent", "copilot", "github_copilot"}:
         return await _bridge_copilot_agent(prompt)
+    if bid in {"browserbase", "browser_base", "bb"}:
+        return await _bridge_browserbase(prompt)
+    if bid in {"jules", "jules_agent"}:
+        return await _bridge_jules(prompt)
     if bid in {"isaac_cloud", "isaac_remote", "cloud", "isaac_free"}:
         return await _bridge_isaac_cloud(prompt)
     if bid in {"isaac_fleet", "fleet", "isaac_status"}:
@@ -208,7 +232,7 @@ async def _bridge_github(prompt: str) -> dict[str, Any]:
 
         # issues / prs / repo
         m = re.search(r"([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)", text)
-        owner = m.group(1) if m else "glinkasteffen075-bit"
+        owner = m.group(1) if m else "hansheute88"
         repo = m.group(2) if m else "Isaac"
 
         if low.startswith("issues") or " issues" in low or low.startswith("issue"):
@@ -378,6 +402,44 @@ async def _bridge_copilot_agent(prompt: str) -> dict[str, Any]:
         }
     except Exception as exc:
         return {"ok": False, "error": str(exc), "via": "bridge.copilot_agent"}
+
+
+async def _bridge_browserbase(prompt: str) -> dict[str, Any]:
+    try:
+        from integrations.browserbase import BrowserbaseAdapter
+        adapter = BrowserbaseAdapter()
+        result = await adapter.create_session(metadata={"source": "isaac", "request": prompt[:180]})
+        return {
+            **result,
+            "output": (
+                f"Browserbase session {result.get('session_id') or '(none)'}"
+                if result.get("ok") else result.get("error", "")
+            ),
+        }
+    except Exception as exc:
+        return {"ok": False, "error": str(exc), "via": "bridge.browserbase"}
+
+
+async def _bridge_jules(prompt: str) -> dict[str, Any]:
+    try:
+        from integrations.jules import JulesAdapter
+        adapter = JulesAdapter()
+        text = prompt
+        low = text.lower()
+        for prefix in ("jules:", "jules-agent:", "jules agent:"):
+            if low.startswith(prefix):
+                text = text[len(prefix):].strip()
+                break
+        result = await adapter.create_session(text or prompt)
+        return {
+            **result,
+            "output": (
+                f"Jules session {result.get('session_id') or '(none)'}"
+                if result.get("ok") else result.get("error", "")
+            ),
+        }
+    except Exception as exc:
+        return {"ok": False, "error": str(exc), "via": "bridge.jules"}
 
 
 async def _bridge_isaac_cloud(prompt: str) -> dict[str, Any]:

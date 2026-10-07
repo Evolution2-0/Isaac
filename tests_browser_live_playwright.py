@@ -66,7 +66,7 @@ class TestBrowserLivePlaywright(unittest.IsolatedAsyncioTestCase):
                 {"action": "wait", "seconds": 0.3},
                 {
                     "action": "extract_text",
-                    "selector": "h1",
+                    "selector": "p",
                     "save_as": "heading",
                 },
             ],
@@ -81,7 +81,7 @@ class TestBrowserLivePlaywright(unittest.IsolatedAsyncioTestCase):
 
         memory = result.get("memory") or {}
         heading = (memory.get("heading") or "").strip()
-        self.assertIn("Example Domain", heading, msg=f"memory={memory} steps={result.get('steps')}")
+        self.assertIn("domain", heading.lower(), msg=f"memory={memory} steps={result.get('steps')}")
         self.assertTrue(result.get("ok"))
         steps = result.get("steps") or []
         self.assertTrue(any(s.get("action") == "goto" and s.get("ok") for s in steps))

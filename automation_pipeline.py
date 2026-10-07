@@ -182,7 +182,7 @@ def _probe_github() -> dict[str, Any]:
         "auto_pr": _env_bool("ISAAC_GH_AUTO_PR", False),
         "auto_merge": _env_bool("ISAAC_GH_AUTO_MERGE", False),
         "allowlist": (
-            os.getenv("ISAAC_GH_REPO_ALLOWLIST") or "sc0rp0815/Isaac,sco0rp/IsaacNew"
+            os.getenv("ISAAC_GH_REPO_ALLOWLIST") or "hansheute88/isaac,sc0rp0815/Isaac,sco0rp/IsaacNew"
         ).strip(),
     }
     if not token:

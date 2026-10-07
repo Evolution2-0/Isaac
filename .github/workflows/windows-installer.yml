@@ -1,0 +1,96 @@
+name: Build Isaac Windows Installer
+
+on:
+  push:
+    branches: ["main", "feature/windows11-installer"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows-installer:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate Isaac on Windows
+        shell: pwsh
+        env:
+          ISAAC_DISABLE_VECTOR_MEMORY: "1"
+        run: |
+          python -m venv .venv
+          .\.venv\Scripts\python.exe -m pip install --upgrade pip setuptools wheel
+          .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+          .\.venv\Scripts\python.exe -m py_compile isaac_core.py executor.py low_complexity.py memory.py relay.py logic.py watchdog.py task_checkpoint.py windows_desktop.py computer_use.py
+          .\.venv\Scripts\python.exe -c "import app; print('Flask entrypoint OK')"
+          .\.venv\Scripts\python.exe -m unittest tests_provider_configuration -q
+          .\.venv\Scripts\python.exe -c "from computer_use import detect_runtime, computer_use_enabled; print('Computer-Use runtime:', detect_runtime()); print('Computer-Use enabled:', computer_use_enabled())"
+          $stdout = Join-Path $env:RUNNER_TEMP 'isaac-startup.stdout.log'
+          $stderr = Join-Path $env:RUNNER_TEMP 'isaac-startup.stderr.log'
+          $proc = Start-Process -FilePath '.\\.venv\\Scripts\\python.exe' -ArgumentList 'isaac_core.py' -WorkingDirectory $PWD -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
+          Start-Sleep -Seconds 12
+          if ($proc.HasExited) {
+            $out = if (Test-Path $stdout) { Get-Content $stdout -Raw } else { '' }
+            $err = if (Test-Path $stderr) { Get-Content $stderr -Raw } else { '' }
+            Write-Host "Isaac exited during startup with code $($proc.ExitCode)"
+            Write-Host $out
+            Write-Host $err
+            if ($proc.ExitCode -ne 0) { throw "Isaac startup smoke test failed with exit code $($proc.ExitCode)." }
+          } else {
+            Write-Host 'Isaac core stayed alive for the startup smoke test window.'
+            Stop-Process -Id $proc.Id -Force
+          }
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup --no-progress -y
+      - name: Remove build-only virtualenv before packaging
+        shell: pwsh
+        run: Remove-Item -Recurse -Force .venv -ErrorAction SilentlyContinue
+      - name: Build IsaacSetup.exe
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          $iscc = Join-Path ([Environment]::GetEnvironmentVariable('ProgramFiles(x86)')) 'Inno Setup 6\ISCC.exe'
+          & $iscc 'installer\windows\Isaac.iss'
+          if (-not (Test-Path 'dist\IsaacSetup.exe')) { throw 'IsaacSetup.exe was not created.' }
+      - name: Install and smoke test packaged installer
+        shell: pwsh
+        env:
+          ISAAC_DISABLE_VECTOR_MEMORY: "1"
+        run: |
+          $installRoot = Join-Path $env:LOCALAPPDATA 'Isaac'
+          if (Test-Path $installRoot) { Remove-Item $installRoot -Recurse -Force }
+          $installer = Join-Path $PWD 'dist\\IsaacSetup.exe'
+          $install = Start-Process -FilePath $installer -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',('/DIR="' + $installRoot + '"')) -Wait -PassThru
+          if ($install.ExitCode -ne 0) { throw "IsaacSetup.exe exited with code $($install.ExitCode)." }
+          $launcher = Join-Path $installRoot 'start_isaac_windows.cmd'
+          if (-not (Test-Path $launcher)) { throw "Installed launcher not found: $launcher" }
+          $stdout = Join-Path $env:RUNNER_TEMP 'installed-isaac.stdout.log'
+          $stderr = Join-Path $env:RUNNER_TEMP 'installed-isaac.stderr.log'
+          $proc = Start-Process -FilePath 'cmd.exe' -ArgumentList '/c', $launcher -WorkingDirectory $installRoot -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
+          Start-Sleep -Seconds 12
+          if ($proc.HasExited) {
+            $out = if (Test-Path $stdout) { Get-Content $stdout -Raw } else { '' }
+            $err = if (Test-Path $stderr) { Get-Content $stderr -Raw } else { '' }
+            Write-Host $out
+            Write-Host $err
+            if ($proc.ExitCode -ne 0) { throw "Installed Isaac launcher failed with exit code $($proc.ExitCode)." }
+          } else {
+            Write-Host 'Packaged installer smoke test passed: installed Isaac stayed alive.'
+            Stop-Process -Id $proc.Id -Force
+          }
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: IsaacSetup-windows11
+          path: dist/IsaacSetup.exe
+          if-no-files-found: error
+          retention-days: 30

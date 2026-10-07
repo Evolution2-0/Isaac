@@ -9,6 +9,7 @@ Fixes gegenüber v1:
   - Nachfrage-Prompts kontextspezifischer
   - Decompose-Logik produziert sauberere atomare Sub-Tasks
 """
+from __future__ import annotations
 
 import re
 import time

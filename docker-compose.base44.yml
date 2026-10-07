@@ -1,0 +1,26 @@
+services:
+  isaac:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - ISAAC_FREE_CLOUD=1
+      - ISAAC_UNIFIED_PORT=1
+      - ISAAC_BIND_HOST=0.0.0.0
+      - ISAAC_DISABLE_VECTOR_MEMORY=1
+      - ACTIVE_PROVIDER=groq
+      - PYTHONUNBUFFERED=1
+    env_file:
+      - /run/base44/app.env
+    command: ["sh","-ec","pip install -q -r requirements-free.txt flask sentry-sdk && exec python isaac_core.py"]
+    healthcheck:
+      test: ["CMD","python","-c","import urllib.request;urllib.request.urlopen('http://127.0.0.1:3000/healthz',timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 4
+      start_period: 60s
+    restart: on-failure

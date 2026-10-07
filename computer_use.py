@@ -66,6 +66,8 @@ def detect_runtime() -> str:
         return "termux"
     if _is_s8_linux_root():
         return "s8"
+    if os.name == "nt":
+        return "windows_desktop"
     if os.getenv("DISPLAY") or _command_exists("xdotool"):
         return "linux_desktop"
     return "generic"
@@ -78,7 +80,7 @@ def computer_use_enabled() -> bool:
     explicit = getattr(cfg, "computer_use_enabled", None)
     if explicit is not None:
         return bool(explicit)
-    return detect_runtime() in {"termux", "s8", "linux_desktop"}
+    return detect_runtime() in {"termux", "s8", "linux_desktop", "windows_desktop"}
 
 
 def computer_use_live() -> bool:
@@ -427,6 +429,9 @@ class ComputerUseRuntime:
         except OSError as exc:
             return {"ok": False, "error": f"Screenshot-Pfad nicht beschreibbar: {exc}"}
 
+        if self.runtime == "windows_desktop":
+            from windows_desktop import screenshot
+            return await screenshot(str(path))
         if self.runtime == "termux" and _command_exists("termux-screenshot"):
             proc = await asyncio.create_subprocess_exec(
                 "termux-screenshot",
@@ -526,6 +531,9 @@ class ComputerUseRuntime:
         }
 
     async def _clipboard_get(self, params: dict[str, Any]) -> dict[str, Any]:
+        if self.runtime == "windows_desktop":
+            from windows_desktop import clipboard_get
+            return await clipboard_get()
         if await self._termux_bridge_available():
             from termux_bridge import run_termux_command
             result = await run_termux_command(["termux-clipboard-get"], timeout=12.0)
@@ -556,6 +564,9 @@ class ComputerUseRuntime:
 
     async def _clipboard_set(self, params: dict[str, Any]) -> dict[str, Any]:
         text = str(params.get("text") or "")
+        if self.runtime == "windows_desktop":
+            from windows_desktop import clipboard_set
+            return await clipboard_set(text)
         if await self._termux_bridge_available():
             from termux_bridge import run_termux_command
             result = await run_termux_command(["termux-clipboard-set", text], timeout=12.0)
@@ -589,6 +600,9 @@ class ComputerUseRuntime:
         target = (params.get("target") or "").strip().strip("\"'")
         if not target:
             return {"ok": False, "error": "Leeres Ziel"}
+        if self.runtime == "windows_desktop":
+            from windows_desktop import open_target
+            return await open_target(target)
         if await self._termux_bridge_available():
             from termux_bridge import run_termux_command
             if target.startswith(("http://", "https://")):
@@ -627,6 +641,9 @@ class ComputerUseRuntime:
 
     async def _tap(self, params: dict[str, Any]) -> dict[str, Any]:
         x, y = int(params.get("x", 0)), int(params.get("y", 0))
+        if self.runtime == "windows_desktop":
+            from windows_desktop import tap
+            return await tap(x, y)
         if await self._termux_bridge_available():
             from termux_bridge import run_android_input
             result = await run_android_input(["tap", str(x), str(y)], timeout=12.0)
@@ -665,6 +682,9 @@ class ComputerUseRuntime:
 
     async def _type_text(self, params: dict[str, Any]) -> dict[str, Any]:
         text = str(params.get("text") or "")
+        if self.runtime == "windows_desktop":
+            from windows_desktop import type_text
+            return await type_text(text)
         if await self._termux_bridge_available():
             from termux_bridge import run_android_input
             result = await run_android_input(["text", text.replace(" ", "%s")], timeout=20.0)
@@ -707,6 +727,9 @@ class ComputerUseRuntime:
         return {"ok": False, "error": "Texteingabe nicht verfügbar (xdotool/input/clipboard)"}
 
     async def _swipe(self, params: dict[str, Any]) -> dict[str, Any]:
+        if self.runtime == "windows_desktop":
+            from windows_desktop import swipe
+            return await swipe(int(params.get("x1",0)), int(params.get("y1",0)), int(params.get("x2",0)), int(params.get("y2",0)), int(params.get("ms",300)))
         if await self._termux_bridge_available():
             from termux_bridge import run_android_input
             result = await run_android_input(
@@ -828,6 +851,13 @@ class ComputerUseRuntime:
 
     async def _ui_key(self, params: dict[str, Any]) -> dict[str, Any]:
         from ui_automation import android_keycode, audit_ui_action
+
+        if self.runtime == "windows_desktop":
+            from windows_desktop import key
+            result = await key(str(params.get("code") or ""))
+            if result.get("ok"):
+                audit_ui_action("ui_key", f"code={params.get('code', '')}")
+            return result
 
         if not _command_exists("input") and not await self._termux_bridge_available():
             return {"ok": False, "error": "ui key benötigt Android input-Befehl"}

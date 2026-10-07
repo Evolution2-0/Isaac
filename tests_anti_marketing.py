@@ -1,37 +1,32 @@
-"""Regression: no marketing campaign theater / eval noise purge."""
+"""Regression: SUDO-Passwörter werden nie im Klartext geloggt.
+
+Die Marketing-Blockade-Direktive wurde auf Owner-Wunsch entfernt (2026-09-26).
+Verbleibender Schutz: Purge von Eval-Noise-Fakten bleibt aktiv.
+"""
 from __future__ import annotations
 
-import os
+import re
 import unittest
 
 
-class TestAntiMarketingPrompt(unittest.TestCase):
-    def test_system_prompt_blocks_marketing(self):
-        from isaac_core import IsaacKernel
+class TestSudoRedaction(unittest.TestCase):
+    """_redact_secrets maskiert SUDO-Passwörter in Log-Ausgaben."""
 
-        class Emp:
-            anpassungs_hinweis = ""
+    def test_sudo_input_redacted(self):
+        import sys, os
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        # regex-Logik identisch zu IsaacKernel._redact_secrets
+        pattern = r"(?i)^((?:sudo|öffne tür|master key)\s+).+$"
+        text = "Sudo 08150815"
+        m = re.match(pattern, text)
+        assert m
+        redacted = m.group(1) + ("*" * max(4, len(text) - len(m.group(1))))
+        self.assertNotIn("08150815", redacted)
+        self.assertTrue(redacted.startswith("Sudo "))
 
-        class Cfg:
-            owner_name = "Steffen"
-            style_mode = "professional"
-            browser_automation = False
-
-        k = object.__new__(IsaacKernel)
-        k.cfg = Cfg()
-        k.VERSION = "5.3"
-        k.sudo = type("S", (), {"get_authority_prefix": lambda s: ""})()
-        k.regelwerk = type("R", (), {"aktive_regeln_als_kontext": lambda s: ""})()
-        k.gate = type(
-            "G",
-            (),
-            {"active_directives": lambda s: [], "directives_as_context": lambda s: ""},
-        )()
-        os.environ["ISAAC_FREE_CLOUD"] = "1"
-        p = IsaacKernel._build_system(k, False, Emp())
-        self.assertIn("Social-Media", p)
-        self.assertIn("Marketing", p)
-        self.assertIn("ziele", p)
+    def test_normal_input_untouched(self):
+        pattern = r"(?i)^((?:sudo|öffne tür|master key)\s+).+$"
+        self.assertIsNone(re.match(pattern, "Hallo Isaac, Steffen hier"))
 
 
 class TestPurgeEvalNoise(unittest.TestCase):

@@ -97,3 +97,9 @@ Isaac/
 trans.py
 trans.sh
 .aider*
+
+# Repo ballast: never commit full-code dumps or vendored binaries
+ISAAC_FULL_CODE.*
+*.vsix
+.github/instructions/*.zip
+.github/instructions/*.pdf

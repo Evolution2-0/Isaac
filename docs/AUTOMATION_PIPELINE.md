@@ -84,7 +84,7 @@ GH Actions jobs:
 | `ISAAC_AUTO_REDEPLOY` | `0` | Optional auto-redeploy on drift (Stage 2) |
 | `ISAAC_GH_AUTO_PR` | `0` | Aggressive auto-PR (Stage 3) |
 | `ISAAC_GH_AUTO_MERGE` | `0` | Never merge main by default |
-| `ISAAC_GH_REPO_ALLOWLIST` | `sc0rp0815/Isaac,sco0rp/IsaacNew` | Comma-separated repos |
+| `ISAAC_GH_REPO_ALLOWLIST` | `hansheute88/isaac,sc0rp0815/Isaac,sco0rp/IsaacNew` | Comma-separated repos |
 | `ISAAC_GH_MAX_PR_PER_DAY` | `3` | Rate limit (Stage 3) |
 | `ISAAC_COGNEE_ENABLED` | `0` | Cognee adapter |
 | `ISAAC_COGNEE_ALLOW_CLOUD` | `0` | Cloud REST |

@@ -20,6 +20,7 @@ Sektor 91: Leid als Interface-Inkompatibilität
 Sektor 93: Dekompressions-Engpass
 Sektor 94: Low-Resolution-Protocol (bei Stress > 0.7)
 """
+from __future__ import annotations
 
 import json
 import re

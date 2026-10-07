@@ -21,6 +21,7 @@ Skills werden:
   - Dynamisch aktualisiert (aus tatsächlicher Performance)
   - Gespeichert in SQLite
 """
+from __future__ import annotations
 
 import json
 import time

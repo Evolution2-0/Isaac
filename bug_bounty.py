@@ -36,7 +36,7 @@ PROGRAMS_PATH = DATA_DIR / "bug_bounty_programs.json"
 PROGRAMS_EXAMPLE = Path(__file__).resolve().parent / "bug_bounty_programs.example.json"
 REPORT_ROOT = WORKSPACE / "bug_bounty"
 
-_UA = "Isaac-BugBounty/5.3 (+authorized-owner-research; sc0rp0815/Isaac)"
+_UA = "Isaac-BugBounty/5.3 (+authorized-owner-research; hansheute88/isaac)"
 
 
 @dataclass

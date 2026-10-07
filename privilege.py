@@ -12,6 +12,7 @@ Jede privilegierte Aktion benötigt:
   2. Einen R-Trace (warum?)
   3. Das benötigte Recht
 """
+from __future__ import annotations
 
 import time
 import functools
@@ -222,6 +223,22 @@ class PrivilegeGate:
         """Steffen fügt eine permanente Direktive hinzu."""
         d = Directive(
             id=f"DIR-{int(time.time())}",
+            text=text,
+            timestamp=time.strftime("%Y-%m-%d %H:%M:%S"),
+            priority=priority,
+        )
+        self._directives.append(d)
+        log.info(f"Direktive hinzugefügt: [{d.id}] {text[:80]}")
+        return d
+
+    def seed_directive(self, directive_id: str, text: str,
+                       priority: int = 10) -> Directive:
+        """Fügt eine Direktive mit stabiler ID hinzu (idempotent, kein Duplikat)."""
+        for d in self._directives:
+            if d.id == directive_id:
+                return d
+        d = Directive(
+            id=directive_id,
             text=text,
             timestamp=time.strftime("%Y-%m-%d %H:%M:%S"),
             priority=priority,

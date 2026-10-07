@@ -25,7 +25,7 @@ Im Admin-Modus:
 
 pkg install python3 git
 cd $HOME
-git clone https://github.com/glinkasteffen075-bit/Isaac.git
+git clone https://github.com/hansheute88/isaac.git
 cd Isaac
 python3 -m venv .venv
 source .venv/bin/activate
@@ -178,7 +178,7 @@ Der Admin-Modus wird in drei Stellen durchgesetzt:
 
 Falls du Probleme mit dem Admin-Modus hast, öffne ein Issue auf GitHub:
 
-https://github.com/glinkasteffen075-bit/Isaac/issues
+https://github.com/hansheute88/isaac/issues
 
 Erwähne:
 - Android-Version

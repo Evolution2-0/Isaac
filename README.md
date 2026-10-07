@@ -21,7 +21,7 @@ Das KI-Modell ist ein Werkzeug zur Ausführung, nicht die autoritative Quelle f�
 | Pipeline | `classify → retrieve → strategy → task → execute → evaluate → memory` |
 | Native Coding (Aider-**Muster**, kein Package) | ✅ `repo_map.py` · `code_edit.py` · `git_ops.py` |
 | Eval-Harness (lokal) | `ISAAC_DISABLE_VECTOR_MEMORY=1 python3 -m evals.eval_runner` → **130/130** |
-| Preferred Remote | `sc0rp0815/Isaac` `main` |
+| Preferred Remote | `hansheute88/isaac` `main` |
 
 **Kanonische Agent-Anweisung (Code + Routing + Do-NOT):** [`AGENTS.md`](AGENTS.md)  
 Dieses README ist die **philosophische / Governance-Hülle**. Bei Widerspruch gilt: **`AGENTS.md` → Checklisten → dieses README**.
@@ -88,6 +88,20 @@ Die langfristige Architektur soll drei Ebenen reflektieren:
 - GRÜN = Execution / Provider / Tool / Interface Layer
 
 Diese Ebenen sind nicht nur organisatorisch, sondern funktional und mental-model-basiert zu verstehen.
+
+### System-Taxonomie & Harte Abgrenzung (A–E)
+
+Zur Vermeidung der Illusion kognitiver Autonomie durch reine Oberflächen- oder Infrastrukturanpassungen gilt für das gesamte Repository eine **harte Unterscheidung in 5 Kategorien** (siehe [`docs/SYSTEM_TAXONOMY.md`](docs/SYSTEM_TAXONOMY.md)):
+
+| Kategorie | Bezeichnung | Beschreibung & Beispiele |
+|-----------|-------------|--------------------------|
+| **A** | **Echte Kernel-Fähigkeit** | Kognitions-Pipeline, Reasoning, Gedächtnis, Goal Engine, Werte/Verfassung (`isaac_core.py`, `executor.py`, `memory.py`, `goal_store.py`, `constitution.py`). |
+| **B** | **Infrastruktur** | Cloud/Host-Deployments, Tool-Execution-Runtime, MCP-Protokoll, System/Termux-Brücken (`deploy/`, `tool_runtime.py`, `mcp_client.py`, `relay.py`, `secrets_store.py`). |
+| **C** | **Observability** | Audit-Trails, Sentry-AI-Spans, Telemetrie, Watchdog & Decision Traces (`audit.py`, `isaac_sentry.py`, `watchdog.py`, `decision_trace.py`, `monitor_api.py`). |
+| **D** | **UI** | Benutzeroberflächen, Web-Dashboards, WebSocket/HTTP-Stream-Server, Chat-Dialoge (`dashboard.html`, `web/`, `monitor_server.py`, `vercel.json`). |
+| **E** | **Demo / Simulation** | Evals-Harness, Unittests, Integrationstests, Remote Smoke-Tests & Mock-Umgebungen (`evals/`, `tests/`, `remote_smoke.py`, `sanity_check.py`). |
+
+**Grundsatz:** Fortschritte an der Erreichbarkeit oder der Oberfläche (Kategorie D/B, z. B. Vercel Dashboard Deploy) verbessern die Zugänglichkeit, stellen jedoch **keinen** Fortschritt der kognitiven Kernel-Architektur (Kategorie A) dar.
 
 ## Optional: External Memory (Mem0 / Cognee / Letta)
 
@@ -208,7 +222,7 @@ Phasenlabels in älteren Prompts („prototype → production“) ersetzen **nic
 ### Master-Prompt 1 — Praxisnah / Produktiv
 
 ```text
-You are an autonomous coding agent working on the repository https://github.com/glinkasteffen075-bit/Isaac.
+You are an autonomous coding agent working on the repository https://github.com/hansheute88/isaac.
 
 MISSION:
 Improve and extend ISAAC incrementally, non-destructively, and in a way that increases modularity, robustness, configurability, privacy, observability, and long-term maintainability.
@@ -249,7 +263,7 @@ RULES:
 ### Master-Prompt 2 — Wissenschaftlich / Architektonisch
 
 ```text
-You are an autonomous coding agent working on the repository https://github.com/glinkasteffen075-bit/Isaac.
+You are an autonomous coding agent working on the repository https://github.com/hansheute88/isaac.
 
 MISSION:
 Advance ISAAC from a functional prototype toward a modular, robust, and extensible cognitive runtime architecture through scientifically grounded, architecture-aware, and non-destructive evolution.
@@ -279,7 +293,7 @@ PRINCIPLES:
 ### Master-Prompt 3 — Agenten-/Produktionsgrad / Copilot-Optimiert
 
 ```text
-You are an autonomous senior software engineering agent and architecture reviewer working on the repository https://github.com/glinkasteffen075-bit/Isaac.
+You are an autonomous senior software engineering agent and architecture reviewer working on the repository https://github.com/hansheute88/isaac.
 
 MISSION:
 Improve ISAAC in a controlled, evidence-driven, and architecture-aware way so that it evolves from a functional prototype into a modular, robust, extensible, and production-grade cognitive runtime.
@@ -306,7 +320,7 @@ QUALITY STANDARDS:
 ### Konsolidierter Master-Prompt für ISAAC
 
 ```text
-You are an autonomous senior software engineering agent working on the repository https://github.com/glinkasteffen075-bit/Isaac.
+You are an autonomous senior software engineering agent working on the repository https://github.com/hansheute88/isaac.
 
 MISSION:
 Improve and extend ISAAC incrementally, safely, and systematically so that it evolves from a functional prototype into a modular, resilient, extensible, production-grade cognitive runtime.

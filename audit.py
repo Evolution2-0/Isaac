@@ -6,6 +6,7 @@ Isaac kann seinen eigenen Audit-Log nicht löschen oder modifizieren.
 
 Format: JSONL (eine JSON-Zeile pro Eintrag)
 """
+from __future__ import annotations
 
 import json
 import time

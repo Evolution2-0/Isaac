@@ -1,0 +1,37 @@
+name: Isaac MCP Integration CI
+
+on:
+  push:
+    branches: [ main, feature/*, feat/* ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-mcp:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install Node.js (for stdio MCP servers)
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Python Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Run MCP Unit Tests
+      env:
+        ISAAC_DISABLE_VECTOR_MEMORY: "1"
+      run: |
+        python -m py_compile isaac_mcp.py mcp_registry.py mcp_jsonrpc.py mcp_server.py
+        python -m unittest tests/test_mcp_integration.py tests/test_isaac_mcp.py

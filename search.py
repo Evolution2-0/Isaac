@@ -19,6 +19,7 @@ Alle Ergebnisse werden:
   - Auf Wunsch als Volltext geladen (URL-Fetcher)
   - Im Cache gehalten (5 Minuten)
 """
+from __future__ import annotations
 
 import asyncio
 import aiohttp

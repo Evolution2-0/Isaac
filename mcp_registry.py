@@ -6,6 +6,8 @@ Leichtgewichtige MCP-nahe Registry mit lokalen Resource-/Tool-/Prompt-Handlern.
 
 import asyncio
 from typing import Dict, Any, List, Callable, Optional
+
+from config import Level
 from result_contract import ensure_result_contract
 
 # Privilege-Mapping: MCP-Name -> benötigte Privilege-Aktion
@@ -16,6 +18,14 @@ MCP_TOOL_PRIVILEGES: Dict[str, str] = {
     "isaac.start_task": "chat_response",
     "isaac.search_web": "internet_search",
     "isaac.run_browser_action": "browser_navigate",
+    "isaac.goal_list": "read_memory",
+    "isaac.goal_get": "read_memory",
+    "isaac.goal_update": "write_memory",
+    "isaac.permission_check": "read_memory",
+    "isaac.safety_check": "read_memory",
+    "isaac.action_request": "chat_response",
+    "isaac.autonomy_evaluate": "read_memory",
+    "isaac.notification_send": "chat_response",
 }
 
 MCP_RESOURCE_PRIVILEGES: Dict[str, str] = {
@@ -107,13 +117,26 @@ class MCPRegistry:
             "resource_privileges": dict(MCP_RESOURCE_PRIVILEGES),
         }
 
-    def invoke_tool(self, name: str, arguments: Dict[str, Any] | None = None) -> Dict[str, Any]:
+    def invoke_tool(
+        self,
+        name: str,
+        arguments: Dict[str, Any] | None = None,
+        *,
+        caller: str = "MCP",
+        caller_level: int = Level.ISAAC,
+        allow_owner_override: bool = True,
+    ) -> Dict[str, Any]:
         tool = self._tools.get(name)
         if not tool:
             return {"ok": False, "error": f"Unknown MCP tool: {name}"}
         args = dict(arguments or {})
-        override_ctx = _extract_override_context(args, source="mcp")
-        denied = _authorize_mcp_tool(name)
+        override_ctx = _extract_override_context(
+            args,
+            source="mcp",
+            caller_level=caller_level,
+            allow_owner_override=allow_owner_override,
+        )
+        denied = _authorize_mcp_tool(name, caller=caller, caller_level=caller_level)
         if denied:
             return denied
         if name in MCP_CONSTITUTION_GATED_TOOLS:
@@ -165,11 +188,21 @@ class MCPRegistry:
             return {"ok": False, "name": name, "error": str(e)}
 
 
-def _authorize_mcp_tool(name: str) -> Optional[Dict[str, Any]]:
-    from privilege import get_gate, isaac_ctx
+def _authorize_mcp_tool(
+    name: str,
+    *,
+    caller: str = "MCP",
+    caller_level: int = Level.ISAAC,
+) -> Optional[Dict[str, Any]]:
+    from privilege import get_gate, PrivCtx
 
     action = MCP_TOOL_PRIVILEGES.get(name, "chat_response")
-    ok, reason = get_gate().authorize(action, isaac_ctx("MCP", f"MCP tool invoke: {name}"))
+    ctx = PrivCtx(
+        caller=caller or "MCP",
+        level=int(caller_level),
+        r_trace=f"MCP tool invoke: {name}",
+    )
+    ok, reason = get_gate().authorize(action, ctx)
     if ok:
         return None
     return ensure_result_contract(
@@ -192,16 +225,24 @@ def _authorize_mcp_resource(uri: str) -> Optional[Dict[str, Any]]:
     return {"ok": False, "uri": uri, "error": reason, "required_privilege": action}
 
 
-def _extract_override_context(args: Dict[str, Any], source: str = "mcp"):
-    from config import Level
+def _extract_override_context(
+    args: Dict[str, Any],
+    source: str = "mcp",
+    *,
+    caller_level: int = Level.ISAAC,
+    allow_owner_override: bool = True,
+):
     from constitution_override import build_override_context
 
     owner_override = bool(args.pop("owner_override", False))
     override_reason = str(args.pop("override_reason", "") or "")
+    if not allow_owner_override:
+        owner_override = False
+        override_reason = ""
     return build_override_context(
         owner_override=owner_override,
         override_reason=override_reason,
-        caller_level=Level.STEFFEN if owner_override else Level.ISAAC,
+        caller_level=Level.STEFFEN if owner_override else int(caller_level),
         source=source,
     )
 
@@ -232,6 +273,180 @@ def _constitution_gate_mcp_tool(
         },
         source="mcp_registry:constitution",
     )
+
+
+def _goal_list(status: str = "active", limit: int = 20, **kwargs) -> Dict[str, Any]:
+    from goal_store import get_goal_store
+
+    status_value = (status or "").strip().lower() or None
+    if status_value not in {None, "active", "paused", "done", "failed"}:
+        return {"ok": False, "error": "ungültiger goal status"}
+    rows = get_goal_store().list_goals(status=status_value)
+    rows = rows[: max(1, min(int(limit), 50))]
+    return {"goals": [g.to_dict() for g in rows], "count": len(rows)}
+
+
+def _goal_get(goal: str = "", **kwargs) -> Dict[str, Any]:
+    from goal_store import get_goal_store
+
+    item = get_goal_store().find_goal(goal)
+    if not item:
+        return {"ok": False, "error": "goal not found"}
+    subgoals = get_goal_store().list_subgoals(item.id, status=None)
+    return {"goal": item.to_dict(), "subgoals": [s.to_dict() for s in subgoals]}
+
+
+def _goal_update(goal: str = "", status: str = "", **kwargs) -> Dict[str, Any]:
+    from goal_store import get_goal_store
+
+    status_value = (status or "").strip().lower()
+    if status_value not in {"active", "paused", "done", "failed"}:
+        return {"ok": False, "error": "status must be active, paused, done, or failed"}
+    item = get_goal_store().set_status(goal, status_value)
+    if not item:
+        return {"ok": False, "error": "goal not found"}
+    return {"ok": True, "goal": item.to_dict()}
+
+
+def _permission_check(action: str = "", trace: str = "", **kwargs) -> Dict[str, Any]:
+    from privilege import PrivCtx, get_gate
+
+    action = (action or "").strip()
+    trace = (trace or "").strip()
+    if not action:
+        return {"ok": False, "error": "action fehlt"}
+    if len(trace) < 15:
+        trace = f"MCP permission check for {action}"
+    ok, reason = get_gate().authorize(
+        action, PrivCtx(caller="MCP", level=Level.TASK, r_trace=trace)
+    )
+    return {"ok": True, "allowed": bool(ok), "reason": reason, "action": action, "caller_level": Level.TASK}
+
+
+def _safety_check(
+    action: str = "tool_invoke",
+    risk: str = "normal",
+    outside_effect: bool = True,
+    destructive: bool = False,
+    **kwargs,
+) -> Dict[str, Any]:
+    from constitution import get_constitution
+
+    metadata = {
+        "outside_effect": bool(outside_effect),
+        "audit_logged": True,
+        "risk": str(risk or "normal"),
+        "destructive": bool(destructive),
+        "owner_approved": False,
+    }
+    verdict = get_constitution().validate_action(action, metadata)
+    return {
+        "ok": True,
+        "allowed": bool(verdict.get("allowed")),
+        "warnings": verdict.get("warnings", []),
+        "blocked_by": verdict.get("blocked_by", []),
+        "action": action,
+        "metadata": metadata,
+    }
+
+
+def _action_request(
+    action: str = "",
+    reason: str = "",
+    risk: str = "normal",
+    outside_effect: bool = True,
+    **kwargs,
+) -> Dict[str, Any]:
+    """Create a full autonomy-gated action proposal; it never executes."""
+    action = (action or "").strip()
+    reason = (reason or "").strip()
+    if not action:
+        return {"ok": False, "error": "action fehlt"}
+
+    from isaac_control_plane import get_autonomy_control_plane
+
+    evaluated = get_autonomy_control_plane().evaluate(
+        action=action,
+        reason=reason,
+        risk=risk,
+        outside_effect=outside_effect,
+        destructive=bool(kwargs.get("destructive", False)),
+        goal=str(kwargs.get("goal", "") or ""),
+        memory_query=str(kwargs.get("memory_query", "") or ""),
+        caller=str(kwargs.get("_caller", "MCP")),
+        caller_level=int(kwargs.get("_caller_level", Level.TASK)),
+        trusted_internal=bool(kwargs.get("_trusted_internal", False)),
+    )
+    decision = evaluated.get("output", {}).get("decision", {})
+    return {
+        "ok": bool(evaluated.get("ok")),
+        "request": {
+            **decision.get("proposal", {
+                "action": action,
+                "reason": reason[:500],
+                "risk": str(risk or "normal"),
+                "outside_effect": bool(outside_effect),
+                "executed": False,
+            }),
+            "decision": decision,
+        },
+    }
+
+
+def _autonomy_evaluate(
+    action: str = "",
+    reason: str = "",
+    risk: str = "normal",
+    outside_effect: bool = True,
+    destructive: bool = False,
+    goal: str = "",
+    memory_query: str = "",
+    **kwargs,
+) -> Dict[str, Any]:
+    """Run the full Isaac autonomy gate without executing the action."""
+    from isaac_control_plane import get_autonomy_control_plane
+
+    return get_autonomy_control_plane().evaluate(
+        action=action,
+        reason=reason,
+        risk=risk,
+        outside_effect=outside_effect,
+        destructive=destructive,
+        goal=goal,
+        memory_query=memory_query,
+        caller=str(kwargs.get("_caller", "MCP")),
+        caller_level=int(kwargs.get("_caller_level", Level.TASK)),
+        trusted_internal=bool(kwargs.get("_trusted_internal", False)),
+    )
+
+
+def _notification_send(
+    message: str = "",
+    title: str = "Isaac",
+    channel: str = "audit",
+    **kwargs,
+) -> Dict[str, Any]:
+    """Record a notification intent; delivery remains outside the MCP registry."""
+    message = (message or "").strip()
+    if not message:
+        return {"ok": False, "error": "message fehlt"}
+    from audit import AuditLog
+
+    AuditLog.action(
+        "MCP",
+        "notification_requested",
+        f"title={title[:80]} channel={channel[:40]} message_len={len(message)}",
+        erfolg=True,
+    )
+    return {
+        "ok": True,
+        "queued": False,
+        "recorded": True,
+        "channel": channel,
+        "title": title[:120],
+        "message_preview": message[:240],
+        "delivery": "not configured",
+    }
 
 
 def _run_async(coro):
@@ -441,6 +656,91 @@ def _register_defaults(reg: MCPRegistry):
         },
         handler=_search_web,
     )
+    reg.register_tool(
+        "isaac.goal_list",
+        {
+            "description": "Listet Isaacs aktive oder abgeschlossene Owner-Ziele.",
+            "inputSchema": {"type": "object", "properties": {"status": {"type": "string"}, "limit": {"type": "integer"}}},
+            "required_privilege": "read_memory",
+        },
+        handler=_goal_list,
+    )
+    reg.register_tool(
+        "isaac.goal_get",
+        {
+            "description": "Liest ein Owner-Ziel und seine Subgoals.",
+            "inputSchema": {"type": "object", "properties": {"goal": {"type": "string"}}, "required": ["goal"]},
+            "required_privilege": "read_memory",
+        },
+        handler=_goal_get,
+    )
+    reg.register_tool(
+        "isaac.goal_update",
+        {
+            "description": "Ändert den Status eines Owner-Ziels; keine Tool-Ausführung.",
+            "inputSchema": {"type": "object", "properties": {"goal": {"type": "string"}, "status": {"type": "string"}}, "required": ["goal", "status"]},
+            "required_privilege": "write_memory",
+        },
+        handler=_goal_update,
+    )
+    reg.register_tool(
+        "isaac.permission_check",
+        {
+            "description": "Prüft, ob ein MCP-Aufruf unter Isaacs Privilege-Gate zulässig wäre.",
+            "inputSchema": {"type": "object", "properties": {"action": {"type": "string"}, "trace": {"type": "string"}}, "required": ["action"]},
+            "required_privilege": "read_memory",
+        },
+        handler=_permission_check,
+    )
+    reg.register_tool(
+        "isaac.safety_check",
+        {
+            "description": "Prüft eine geplante Aktion gegen Isaacs Constitution, ohne sie auszuführen.",
+            "inputSchema": {"type": "object", "properties": {"action": {"type": "string"}, "risk": {"type": "string"}, "outside_effect": {"type": "boolean"}, "destructive": {"type": "boolean"}}},
+            "required_privilege": "read_memory",
+        },
+        handler=_safety_check,
+    )
+    reg.register_tool(
+        "isaac.autonomy_evaluate",
+        {
+            "description": "Führt Intent-, Memory-, Goal-, Permission-, Safety- und Confirmation-Prüfung zusammen; führt niemals aus.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "action": {"type": "string"},
+                    "reason": {"type": "string"},
+                    "risk": {"type": "string"},
+                    "outside_effect": {"type": "boolean"},
+                    "destructive": {"type": "boolean"},
+                    "goal": {"type": "string"},
+                    "memory_query": {"type": "string"},
+                },
+                "required": ["action"],
+            },
+            "required_privilege": MCP_TOOL_PRIVILEGES["isaac.autonomy_evaluate"],
+        },
+        handler=_autonomy_evaluate,
+    )
+    reg.register_tool(
+        "isaac.action_request",
+        {
+            "description": "Erzeugt einen geprüften Aktionsvorschlag; führt die Aktion niemals aus.",
+            "inputSchema": {"type": "object", "properties": {"action": {"type": "string"}, "reason": {"type": "string"}, "risk": {"type": "string"}, "outside_effect": {"type": "boolean"}}, "required": ["action"]},
+            "required_privilege": "chat_response",
+        },
+        handler=_action_request,
+    )
+    reg.register_tool(
+        "isaac.notification_send",
+        {
+            "description": "Erfasst eine Benachrichtigungsanforderung; externe Zustellung ist nicht implizit.",
+            "inputSchema": {"type": "object", "properties": {"message": {"type": "string"}, "title": {"type": "string"}, "channel": {"type": "string"}}, "required": ["message"]},
+            "required_privilege": "chat_response",
+        },
+        handler=_notification_send,
+    )
+
     reg.register_tool(
         "isaac.run_browser_action",
         {

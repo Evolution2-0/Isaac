@@ -92,6 +92,15 @@ Ideen von [Aider](https://github.com/Aider-AI/aider) (RepoMap + SEARCH/REPLACE +
 **Evals:** `evals/coding_eval.py` (Routing A–G-ähnlich, RepoMap, E2E Edit+Commit).  
 **Flags:** `ISAAC_REPO_MAP`, `ISAAC_CODE_EDIT`, `ISAAC_CODE_EDIT_DRY_RUN`, `ISAAC_GIT_OPS`, `ISAAC_GIT_OPS_DRY_RUN`, `ISAAC_GIT_OPS_AUTO_COMMIT` (default off).
 
+
+### 8. Declarative Prompt & Rule Optimization (DSPy-inspiriert — kein Package)
+
+- **Muster:** Automatic Prompt & Few-Shot Optimization basierend auf Evaluation-Feedback statt manueller Prompt-Pflege.
+- **Isaac:**
+  - Eval-Harness (`evals/`) liefert die objektive Ground Truth für Routing, Klassifikation und E2E-Task-Erfüllung.
+  - Native Prompt-Refinement-Schleife (`learning_engine` / `low_complexity.py`): Analysiert Misklafflikationen und optimiert dynamische Prompt- & Routing-Regeln in `data/runtime_settings.json` ohne Kernel-Code-Mutation.
+- **Do-NOT:** `import dspy`, schwere Teleprompter/Optimizer-Frameworks als Runtime-Abhängigkeit, unkontrollierte Live-Code-Mutation.
+
 ## Auswahlregel für künftige Übernahmen
 
 1. Passt es zur Pipeline `classify → retrieve → strategy → task → execute → evaluate → memory`?

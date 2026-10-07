@@ -776,7 +776,7 @@ class CopilotAgentAdapter:
         except Exception:
             pass
         # default glinka
-        return "glinkasteffen075-bit", "Isaac"
+        return "hansheute88", "Isaac"
 
     @staticmethod
     def _parse_output(stdout: str) -> tuple[str, str, dict[str, Any] | None]:

@@ -34,7 +34,13 @@ class RateLimiter:
         self.tpm = max(1, tpm)
         self._req_times: deque[float] = deque()
         self._tok_log: deque[tuple[float, int]] = deque()
-        self._lock = asyncio.Lock()
+        self._lock_obj: Optional[asyncio.Lock] = None
+
+    @property
+    def _lock(self) -> asyncio.Lock:
+        if self._lock_obj is None:
+            self._lock_obj = asyncio.Lock()
+        return self._lock_obj
 
     @staticmethod
     def estimate_tokens(text: str) -> int:

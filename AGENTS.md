@@ -1,7 +1,7 @@
 # AGENTS.md — Isaac Repository & Master-Arbeitsanweisung
 
 > Kanonische Agenten-Anweisung für Codex, Claude, Copilot, Cursor und alle automatisierten Entwicklungsroutinen.
-> Repository: https://github.com/glinkasteffen075-bit/Isaac
+> Repository: https://github.com/hansheute88/isaac
 > Konsolidiert aus `MASTER_ARBEITSANWEISUNG_PROMPT.md`, READMEs, Leitdateien und Architekturdocs.
 >
 > **Agent-Tool-Kompatibilität:** `AGENTS.md` ist die einzige bearbeitbare Quelle. `AGENT.md` ist ein Symlink auf diese Datei (agents.md-Format).
@@ -79,6 +79,20 @@ Core runtime lives in the repository root.
 | **GRÜN** (Execution) | `executor.py`, `relay.py`, `tool_runtime.py`, `code_edit.py`, `git_ops.py`, `search.py`, `browser.py`, `decomposer.py` | LLM, Tools, Code-Edits, Git, Suche |
 
 **Entwicklungsrichtung:** vom modularen Nebeneinander zur kausal erklärbaren Vernetzung.
+
+### System-Taxonomie & Entwicklungs-Disziplin (A–E)
+
+Alle Aufgaben, Pull Requests und Commits müssen strikt nach folgenden **5 Kategorien** eingeordnet werden (Details: [`docs/SYSTEM_TAXONOMY.md`](docs/SYSTEM_TAXONOMY.md)):
+
+1. **A. Echte Kernel-Fähigkeit:** Kognitions-Pipeline, Reasoning, Gedächtnis, Goal Engine, Ethik, Verfassung, Selbstmodell (`isaac_core.py`, `executor.py`, `memory.py`, `goal_store.py`, `constitution.py`).
+2. **B. Infrastruktur:** Cloud-Deployments, Tool-Execution-Runtime, MCP-Protokoll, Termux-Brücken, Settings (`deploy/`, `tool_runtime.py`, `mcp_client.py`, `relay.py`, `secrets_store.py`).
+3. **C. Observability:** Audit-Trails, Telemetrie, Sentry-AI-Spans, Watchdog & Decision Traces (`audit.py`, `isaac_sentry.py`, `watchdog.py`, `decision_trace.py`, `monitor_api.py`).
+4. **D. UI:** Dashboards, Web-Frontends, WebSocket/HTTP Stream-Server, Chat-Dialoge (`dashboard.html`, `web/`, `monitor_server.py`, `vercel.json`).
+5. **E. Demo / Simulation:** Eval-Harness, Unittests, Integrationstests, Smoke-Tests & Mocking (`evals/`, `tests/`, `remote_smoke.py`, `sanity_check.py`).
+
+**Eiserne Regel für Agenten:**
+- **Reichweite ≠ Kognition:** Oberflächen- und Deployment-Anpassungen (z. B. Dashboard-Deploys auf Vercel/Render) gehören zu Kategorie D/B. Sie verbessern die Zugänglichkeit, stellen aber **keinen** Fortschritt der kognitiven Kernel-Autonomie dar.
+- Agenten dürfen Änderungen in Kategorie B/D niemals als Fortschritt des kognitiven Kerns (Kategorie A) deklarieren.
 
 ### Verbindliche Architekturprinzipien
 
@@ -262,7 +276,7 @@ Muss ausführen, nicht reinterpretieren. Respektiert nur den übergebenen Task-/
 python3 -m py_compile isaac_core.py executor.py low_complexity.py memory.py relay.py logic.py watchdog.py task_checkpoint.py
 cd /root/Isaac && .venv/bin/python sanity_check.py
 cd /root/Isaac && ISAAC_DISABLE_VECTOR_MEMORY=1 .venv/bin/python -m unittest tests_phase_a_stabilization tests_state_io tests_provider_configuration
-python3 scripts/check_deploy_sync.py   # lokal ↔ sc0rp0815/sco0rp/glinka main ↔ Render live
+python3 scripts/check_deploy_sync.py   # lokal ↔ hansheute88/sc0rp0815/sco0rp/glinka main ↔ Render live
 cd /root/Isaac && .venv/bin/python isaac_core.py   # Dashboard :8766, WS :8765 (lokal)
 cd /root/Isaac && bash run_isaac.sh
 ```
@@ -317,7 +331,7 @@ Vergleicht:
 | Quelle | Was |
 |--------|-----|
 | Lokal | `HEAD` / Branch |
-| Remotes | `sc0rp0815/main` (preferred), `sco0rp/main`, `glinka/main`, `origin/main` |
+| Remotes | `hansheute88/main` (preferred), `sc0rp0815/main`, `sco0rp/main`, `glinka/main`, `origin/main` |
 | Render API | Live-Deploy-Commit (`RENDER_API_KEY` + Service-ID) |
 | Health | `ISAAC_REMOTE_FREE_URL` oder `https://isaac-free.onrender.com/healthz` (Keys + optional `git_commit`) |
 
@@ -438,7 +452,7 @@ Siehe `docs/DRIVE_PATCH_REVIEW_2026-07-24.md` und Master-Roadmap §8 Anti-Liste.
 ## Kompakter Ausführungs-Prompt (Copy-Paste)
 
 ```text
-You are a senior implementation agent for https://github.com/glinkasteffen075-bit/Isaac.
+You are a senior implementation agent for https://github.com/hansheute88/isaac.
 Read AGENTS.md first — it is the canonical instruction set.
 
 MISSION: Improve Isaac incrementally, safely, architecture-aware. Local stateful cognitive kernel — NOT a chatbot wrapper.

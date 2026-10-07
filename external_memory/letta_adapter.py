@@ -156,7 +156,7 @@ class LettaAdapter:
             "Authorization": f"Bearer {self._cfg.letta_api_key}",
             "Accept": "application/json",
             # Cloudflare Error 1010 blocks default Python-urllib UA
-            "User-Agent": "Isaac-LettaAdapter/5.3 (+https://github.com/sc0rp0815/Isaac)",
+            "User-Agent": "Isaac-LettaAdapter/5.3 (+https://github.com/hansheute88/isaac)",
         }
         if body is not None:
             data = json.dumps(body).encode("utf-8")

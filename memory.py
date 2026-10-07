@@ -10,6 +10,7 @@ Persistentes, durchsuchbares Gedächtnis auf drei Ebenen:
 SQLite ist atomar: kein Datenverlust bei Absturz.
 FTS5 für Volltextsuche.
 """
+from __future__ import annotations
 
 import sqlite3
 import json
@@ -18,9 +19,45 @@ import logging
 import re
 from datetime import datetime, timedelta
 from pathlib import Path
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from typing import Optional, Any
 from contextlib import contextmanager
+from enum import Enum
+
+
+class EpistemicClass(Enum):
+    FACT            = "FACT"
+    OBSERVATION     = "OBSERVATION"
+    USER_ASSERTION  = "USER_ASSERTION"
+    INFERENCE       = "INFERENCE"
+    HYPOTHESIS      = "HYPOTHESIS"
+    AGENT_GENERATED = "AGENT_GENERATED"
+    VERIFIED        = "VERIFIED"
+    CONTRADICTED    = "CONTRADICTED"
+    UNCERTAINTY_EVENT = "UNCERTAINTY_EVENT"
+
+
+@dataclass
+class EpistemicMemoryEntry:
+    memory_id: str
+    ts: str
+    key: str
+    value: str
+    epistemic_class: EpistemicClass = EpistemicClass.OBSERVATION
+    source: str = ""
+    source_authority: str = "system"
+    confidence: float = 0.5
+    validity_start: str = ""
+    validity_end: str = ""
+    evidence_task_ids: list[str] = field(default_factory=list)
+    contradicted_by: list[str] = field(default_factory=list)
+    relations: list[dict] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> dict[str, Any]:
+        d = asdict(self)
+        d["epistemic_class"] = self.epistemic_class.value if isinstance(self.epistemic_class, EpistemicClass) else str(self.epistemic_class)
+        return d
 
 from config import DB_PATH, get_config
 from audit  import AuditLog
@@ -48,6 +85,8 @@ class RetrievalContext:
     relevant_procedures: list[dict]
     # Goal-Autonomie Slice 1b: short owner-goal surface for prompt composition
     active_goals: list[dict] = field(default_factory=list)
+    # DIVA runtime modulator snapshot
+    modulator_state: dict[str, float] = field(default_factory=dict)
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -64,6 +103,7 @@ class RetrievalContext:
             "open_questions": self.open_questions,
             "relevant_procedures": self.relevant_procedures,
             "active_goals": self.active_goals,
+            "modulator_state": self.modulator_state,
         }
 
 
@@ -191,6 +231,25 @@ CREATE VIRTUAL TABLE IF NOT EXISTS conv_fts USING fts5(
 -- FTS für Fakten
 CREATE VIRTUAL TABLE IF NOT EXISTS facts_fts USING fts5(
     key, value, content='facts', content_rowid='id'
+);
+
+-- Epistemisches Memory (Pillar 4 - Prove the Kernel)
+CREATE TABLE IF NOT EXISTS epistemic_memories (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    memory_id           TEXT    UNIQUE NOT NULL,
+    ts                  TEXT    NOT NULL,
+    key                 TEXT    NOT NULL,
+    value               TEXT    NOT NULL,
+    epistemic_class     TEXT    NOT NULL DEFAULT 'OBSERVATION',
+    source              TEXT    DEFAULT '',
+    source_authority    TEXT    DEFAULT 'system',
+    confidence          REAL    DEFAULT 0.5,
+    validity_start      TEXT    DEFAULT '',
+    validity_end        TEXT    DEFAULT '',
+    evidence_task_ids   TEXT    DEFAULT '[]',
+    contradicted_by     TEXT    DEFAULT '[]',
+    relations           TEXT    DEFAULT '[]',
+    metadata            TEXT    DEFAULT '{}'
 );
 
 -- Trigger für FTS-Sync
@@ -410,7 +469,22 @@ class Memory:
             candidates.append(fact)
         return candidates
 
-    def search_facts(self, query: str, limit: int = 10) -> list[dict]:
+    def search_facts(self, query: str, limit: int = 10, memory_bias_strength: float = 0.0) -> list[dict]:
+        epistemic_bias_results = []
+        if memory_bias_strength > 0.0:
+            try:
+                ep_entries = self.search_epistemic_memories(query=query, epistemic_class="UNCERTAINTY_EVENT", limit=int(limit * memory_bias_strength) + 1)
+                for ep in ep_entries:
+                    epistemic_bias_results.append({
+                        "id": ep.memory_id,
+                        "key": ep.key,
+                        "value": f"[DIVA Uncertainty] {ep.value}",
+                        "category": "diva_uncertainty",
+                        "updated": ep.ts,
+                        "confidence": ep.confidence,
+                    })
+            except Exception:
+                pass
         terms = [t for t in re.findall(r"[\w]+", (query or "").lower()) if len(t) >= 2]
         if not terms:
             return []
@@ -446,7 +520,7 @@ class Memory:
             dict(r) for r in rows
             if float(r["confidence"] or 0.0) >= MIN_RETRIEVAL_CONFIDENCE
         ]
-        return self.prioritize_temporal_facts(facts, limit=limit)
+        return (epistemic_bias_results + self.prioritize_temporal_facts(facts, limit=limit))[:limit]
 
     @staticmethod
     def prioritize_temporal_facts(
@@ -851,12 +925,25 @@ class Memory:
         self, user_input: str, intent: str = "", interaction_class: str = "",
         n_history: int = 6
     ) -> RetrievalContext:
+        # Obtain DIVA modulator snapshot to adjust retrieval sensitivity
+        mod_state: dict[str, float] = {}
+        effective_min_conf = MIN_RETRIEVAL_CONFIDENCE
+        try:
+            from modulator import get_modulator
+            mod = get_modulator()
+            mod_state = mod.get_all()
+            u_val = mod_state.get("uncertainty", 0.0)
+            if u_val > 0.3:
+                # Lower confidence threshold under high uncertainty to retrieve more candidate facts
+                effective_min_conf = max(0.05, MIN_RETRIEVAL_CONFIDENCE - 0.05 * u_val)
+        except Exception:
+            mod_state = {}
         query_terms = [w for w in re.findall(r"\w+", user_input.lower()) if len(w) >= 4][:5]
         query = " ".join(query_terms) or user_input[:40]
         directives = self.get_directives()[:3]
         facts = [
             f for f in (self.search_facts(query, limit=8) if query else [])
-            if float(f.get("confidence") or 0.0) >= MIN_RETRIEVAL_CONFIDENCE
+            if float(f.get("confidence") or 0.0) >= effective_min_conf
         ]
         seen_fact_keys = {f.get("key") for f in facts}
         for term in {w for w in re.findall(r"\w+", user_input.lower()) if len(w) >= 3}:
@@ -866,7 +953,7 @@ class Memory:
             record = self.get_fact_record(def_key)
             if (
                 record
-                and float(record.get("confidence") or 0.0) >= MIN_RETRIEVAL_CONFIDENCE
+                and float(record.get("confidence") or 0.0) >= effective_min_conf
             ):
                 facts.append(record)
                 seen_fact_keys.add(def_key)
@@ -926,7 +1013,7 @@ class Memory:
             key = (fact.get("key") or "").lower()
             if (
                 self._is_preference_key(key)
-                and normalized["confidence"] >= MIN_RETRIEVAL_CONFIDENCE
+                and normalized["confidence"] >= effective_min_conf
             ):
                 preferences.append({
                     "source": "fact",
@@ -1016,6 +1103,7 @@ class Memory:
             open_questions=open_questions[:3],
             relevant_procedures=relevant_procedures[:3],
             active_goals=active_goals,
+            modulator_state=mod_state,
         )
 
     def _active_goals_for_retrieval(self, *, limit: int = 5) -> list[dict]:
@@ -1195,6 +1283,208 @@ class Memory:
         return self.format_retrieval_context(retrieval_ctx)
 
     # ── Statistiken ───────────────────────────────────────────────────────────
+    # ── Epistemisches Memory (Säule 4 - Prove the Kernel) ─────────────────
+    def add_epistemic_memory(
+        self,
+        key: str,
+        value: str,
+        epistemic_class: str | EpistemicClass = EpistemicClass.OBSERVATION,
+        source: str = "",
+        source_authority: str = "system",
+        confidence: float = 0.5,
+        validity_period: Optional[dict] = None,
+        evidence_task_ids: Optional[list[str]] = None,
+        contradicted_by: Optional[list[str]] = None,
+        relations: Optional[list[dict]] = None,
+        metadata: Optional[dict] = None,
+    ) -> EpistemicMemoryEntry:
+        import uuid
+        ts = time.strftime("%Y-%m-%d %H:%M:%S")
+        mem_id = f"mem_{uuid.uuid4().hex[:10]}"
+        eclass = epistemic_class.value if isinstance(epistemic_class, EpistemicClass) else str(epistemic_class)
+        val_start = (validity_period or {}).get("start", "")
+        val_end = (validity_period or {}).get("end", "")
+        ev_tasks = json.dumps(evidence_task_ids or [])
+        contra = json.dumps(contradicted_by or [])
+        rel = json.dumps(relations or [])
+        meta = json.dumps(metadata or {})
+
+        with _conn() as con:
+            con.execute(
+                "INSERT OR REPLACE INTO epistemic_memories "
+                "(memory_id, ts, key, value, epistemic_class, source, source_authority, "
+                "confidence, validity_start, validity_end, evidence_task_ids, contradicted_by, relations, metadata) "
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                (mem_id, ts, key, value, eclass, source, source_authority,
+                 float(confidence), val_start, val_end, ev_tasks, contra, rel, meta)
+            )
+
+        AuditLog.memory_write("Memory", "epistemic", key)
+        return EpistemicMemoryEntry(
+            memory_id=mem_id,
+            ts=ts,
+            key=key,
+            value=value,
+            epistemic_class=EpistemicClass(eclass) if eclass in EpistemicClass.__members__ else EpistemicClass.OBSERVATION,
+            source=source,
+            source_authority=source_authority,
+            confidence=float(confidence),
+            validity_start=val_start,
+            validity_end=val_end,
+            evidence_task_ids=evidence_task_ids or [],
+            contradicted_by=contradicted_by or [],
+            relations=relations or [],
+            metadata=metadata or {},
+        )
+
+    def get_epistemic_memory(self, memory_id_or_key: str) -> Optional[EpistemicMemoryEntry]:
+        with _conn() as con:
+            row = con.execute(
+                "SELECT * FROM epistemic_memories WHERE memory_id=? OR key=? ORDER BY id DESC LIMIT 1",
+                (memory_id_or_key, memory_id_or_key),
+            ).fetchone()
+        if not row:
+            return None
+        r = dict(row)
+        eclass_str = r.get("epistemic_class", "OBSERVATION")
+        try:
+            eclass = EpistemicClass(eclass_str)
+        except ValueError:
+            eclass = EpistemicClass.OBSERVATION
+        return EpistemicMemoryEntry(
+            memory_id=r["memory_id"],
+            ts=r["ts"],
+            key=r["key"],
+            value=r["value"],
+            epistemic_class=eclass,
+            source=r.get("source", ""),
+            source_authority=r.get("source_authority", "system"),
+            confidence=float(r.get("confidence") or 0.5),
+            validity_start=r.get("validity_start", ""),
+            validity_end=r.get("validity_end", ""),
+            evidence_task_ids=json.loads(r.get("evidence_task_ids") or "[]"),
+            contradicted_by=json.loads(r.get("contradicted_by") or "[]"),
+            relations=json.loads(r.get("relations") or "[]"),
+            metadata=json.loads(r.get("metadata") or "{}"),
+        )
+
+    def resolve_contradiction(
+        self,
+        memory_id: str,
+        contradicting_ref: str,
+        new_epistemic_class: EpistemicClass | str = EpistemicClass.CONTRADICTED,
+        new_confidence: float = 0.1,
+    ) -> Optional[EpistemicMemoryEntry]:
+        """Marks an epistemic memory entry as contradicted by new evidence or task."""
+        entry = self.get_epistemic_memory(memory_id)
+        if not entry:
+            return None
+
+        contradicted_list = list(entry.contradicted_by)
+        if contradicting_ref not in contradicted_list:
+            contradicted_list.append(contradicting_ref)
+
+        eclass_val = new_epistemic_class.value if isinstance(new_epistemic_class, EpistemicClass) else str(new_epistemic_class)
+
+        with _conn() as con:
+            con.execute(
+                "UPDATE epistemic_memories SET epistemic_class=?, confidence=?, contradicted_by=? WHERE memory_id=?",
+                (eclass_val, max(0.0, min(1.0, new_confidence)), json.dumps(contradicted_list), entry.memory_id),
+            )
+        return self.get_epistemic_memory(entry.memory_id)
+
+    def link_evidence_to_memory(
+        self,
+        memory_id: str,
+        task_id: str,
+        confidence_boost: float = 0.0,
+    ) -> Optional[EpistemicMemoryEntry]:
+        """Links an execution Task ID as supporting evidence for an epistemic memory."""
+        entry = self.get_epistemic_memory(memory_id)
+        if not entry:
+            return None
+
+        evidence_list = list(entry.evidence_task_ids)
+        if task_id not in evidence_list:
+            evidence_list.append(task_id)
+
+        updated_confidence = min(1.0, max(0.0, entry.confidence + confidence_boost))
+
+        with _conn() as con:
+            con.execute(
+                "UPDATE epistemic_memories SET evidence_task_ids=?, confidence=? WHERE memory_id=?",
+                (json.dumps(evidence_list), updated_confidence, entry.memory_id),
+            )
+        return self.get_epistemic_memory(entry.memory_id)
+
+    def search_epistemic_memories(
+        self, query: str = "", epistemic_class: Optional[str] = None, limit: int = 20
+    ) -> list[EpistemicMemoryEntry]:
+        with _conn() as con:
+            if epistemic_class:
+                rows = con.execute(
+                    "SELECT * FROM epistemic_memories WHERE epistemic_class=? AND (key LIKE ? OR value LIKE ?) ORDER BY id DESC LIMIT ?",
+                    (epistemic_class, f"%{query}%", f"%{query}%", limit),
+                ).fetchall()
+            else:
+                rows = con.execute(
+                    "SELECT * FROM epistemic_memories WHERE key LIKE ? OR value LIKE ? ORDER BY id DESC LIMIT ?",
+                    (f"%{query}%", f"%{query}%", limit),
+                ).fetchall()
+
+        results = []
+        for row in rows:
+            r = dict(row)
+            eclass_str = r.get("epistemic_class", "OBSERVATION")
+            try:
+                eclass = EpistemicClass(eclass_str)
+            except ValueError:
+                eclass = EpistemicClass.OBSERVATION
+            results.append(
+                EpistemicMemoryEntry(
+                    memory_id=r["memory_id"],
+                    ts=r["ts"],
+                    key=r["key"],
+                    value=r["value"],
+                    epistemic_class=eclass,
+                    source=r.get("source", ""),
+                    source_authority=r.get("source_authority", "system"),
+                    confidence=float(r.get("confidence") or 0.5),
+                    validity_start=r.get("validity_start", ""),
+                    validity_end=r.get("validity_end", ""),
+                    evidence_task_ids=json.loads(r.get("evidence_task_ids") or "[]"),
+                    contradicted_by=json.loads(r.get("contradicted_by") or "[]"),
+                    relations=json.loads(r.get("relations") or "[]"),
+                    metadata=json.loads(r.get("metadata") or "{}"),
+                )
+            )
+        return results
+
+    def mark_contradicted(self, memory_id: str, contradicting_ref: str) -> bool:
+        entry = self.get_epistemic_memory(memory_id)
+        if not entry:
+            return False
+        contra = set(entry.contradicted_by)
+        contra.add(contradicting_ref)
+        contra_json = json.dumps(list(contra))
+        with _conn() as con:
+            con.execute(
+                "UPDATE epistemic_memories SET epistemic_class='CONTRADICTED', contradicted_by=? WHERE memory_id=?",
+                (contra_json, entry.memory_id),
+            )
+        return True
+
+    def mark_verified(self, memory_id: str) -> bool:
+        entry = self.get_epistemic_memory(memory_id)
+        if not entry:
+            return False
+        with _conn() as con:
+            con.execute(
+                "UPDATE epistemic_memories SET epistemic_class='VERIFIED', confidence=1.0 WHERE memory_id=?",
+                (entry.memory_id,),
+            )
+        return True
+
     def stats(self) -> dict:
         with _conn() as con:
             n_conv  = con.execute("SELECT COUNT(*) FROM conversations").fetchone()[0]

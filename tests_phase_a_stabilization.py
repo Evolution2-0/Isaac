@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os
 
 os.environ.setdefault("ISAAC_DISABLE_VECTOR_MEMORY", "1")

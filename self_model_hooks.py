@@ -188,7 +188,7 @@ def enrich_retrieval_with_self_model(
                     "pipeline=classify→retrieve→strategy→task→execute→evaluate→memory; "
                     "executor_does_not_reclassify; normal_chat_no_opportunistic_tools; "
                     "external_memory=mem0/letta/cognee_bounded; "
-                    "canonical_repo=sc0rp0815/Isaac"
+                    "canonical_repo=hansheute88/isaac"
                 ),
                 "source": "self_model",
             })

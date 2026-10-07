@@ -12,8 +12,8 @@ Env (optional):
   ISAAC_REMOTE_FREE_URL   — health URL (default https://isaac-free.onrender.com)
   GITHUB_TOKEN / GH_TOKEN — optional, for private remote tips via API fallback
 
-Remotes checked when present: sc0rp0815, sco0rp, glinka, origin (branch main).
-Canonical deploy remote (preferred): sc0rp0815 → sc0rp0815/Isaac
+Remotes checked when present: hansheute88, sc0rp0815, sco0rp, glinka, origin (branch main).
+Canonical deploy remote (preferred): hansheute88 → hansheute88/isaac
 """
 
 from __future__ import annotations
@@ -174,18 +174,18 @@ def healthz(url: str) -> dict[str, Any]:
 
 def collect_report() -> dict[str, Any]:
     # refresh remotes best-effort
-    for remote in ("sc0rp0815", "sco0rp", "glinka", "origin"):
+    for remote in ("hansheute88", "sc0rp0815", "sco0rp", "glinka", "origin"):
         _run(["git", "fetch", remote, "main"])
 
     local_head = _git_rev("HEAD")
     local_branch_rc, local_branch = _run(["git", "branch", "--show-current"])
     branch = local_branch if local_branch_rc == 0 else ""
 
-    # Primary remotes for deploy sync. Preferred canonical: sc0rp0815/Isaac
-    # (legacy sco0rp/IsaacNew still checked when present).
-    primary_names = ("sc0rp0815", "sco0rp", "glinka")
+    # Primary remotes for deploy sync. Preferred canonical: hansheute88/isaac
+    # (legacy sc0rp0815/Isaac, sco0rp/IsaacNew still checked when present).
+    primary_names = ("hansheute88", "sc0rp0815", "sco0rp", "glinka")
     remotes: dict[str, Any] = {}
-    for name in ("sc0rp0815", "sco0rp", "glinka", "origin"):
+    for name in ("hansheute88", "sc0rp0815", "sco0rp", "glinka", "origin"):
         ref = f"{name}/main"
         sha = _git_rev(ref)
         if sha:
@@ -211,7 +211,7 @@ def collect_report() -> dict[str, Any]:
     }
     remotes_aligned = len(primary_shas) <= 1
     canonical = None
-    for preferred in ("sc0rp0815", "sco0rp", "glinka"):
+    for preferred in ("hansheute88", "sc0rp0815", "sco0rp", "glinka"):
         if preferred in remotes:
             canonical = remotes[preferred]["sha"]
             break

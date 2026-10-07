@@ -7,6 +7,7 @@ Mobile-optimiert:
   - Akku-Sparmodus ab 30% (vorher 20%)
   - Kein paralleles Ollama im Background
 """
+from __future__ import annotations
 
 import asyncio
 import time

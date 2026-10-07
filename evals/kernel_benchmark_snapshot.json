@@ -1,0 +1,1279 @@
+{
+  "timestamp": 1790913531.0080914,
+  "suite": "kernel_benchmark",
+  "passed": 100,
+  "total": 100,
+  "ok": true,
+  "metrics": {
+    "total_tasks": 100,
+    "task_success_rate": 1.0,
+    "intervention_rate": 0.05,
+    "regression_rate": 0.0,
+    "unauthorized_action_rate": 0.0,
+    "learning_gain": 0.0,
+    "trace_completeness": 1.0,
+    "recovery_rate": 0.0,
+    "autonomy_without_loss_of_control": 1.0,
+    "cost_latency": {
+      "total_tokens": 0,
+      "api_cost_estimate_eur": 0.0,
+      "total_runtime_seconds": 47.693699999999986,
+      "total_tool_calls": 0,
+      "provider_switches": 0
+    }
+  },
+  "cases": [
+    {
+      "task_id": "e2e_001",
+      "category": "1_classification_intent",
+      "prompt": "Hallo Isaac, wie geht es dir heute?",
+      "ok": true,
+      "detail": {
+        "category": "1_classification_intent",
+        "response_length": 37,
+        "duration": 0.3424,
+        "detected_intent": "chat",
+        "expected_intent": "CHAT",
+        "interaction_class": "NORMAL_CHAT"
+      }
+    },
+    {
+      "task_id": "e2e_002",
+      "category": "1_classification_intent",
+      "prompt": "Danke für deine Hilfe!",
+      "ok": true,
+      "detail": {
+        "category": "1_classification_intent",
+        "response_length": 37,
+        "duration": 0.3348,
+        "detected_intent": "chat",
+        "expected_intent": "CHAT",
+        "interaction_class": "NORMAL_CHAT"
+      }
+    },
+    {
+      "task_id": "e2e_003",
+      "category": "1_classification_intent",
+      "prompt": "Was ist der Unterschied zwischen Sync und Async in Python?",
+      "ok": true,
+      "detail": {
+        "category": "1_classification_intent",
+        "response_length": 37,
+        "duration": 0.3389,
+        "detected_intent": "chat",
+        "expected_intent": "CHAT",
+        "interaction_class": "NORMAL_CHAT"
+      }
+    },
+    {
+      "task_id": "e2e_004",
+      "category": "1_classification_intent",
+      "prompt": "Status des Kernels anzeigen",
+      "ok": true,
+      "detail": {
+        "category": "1_classification_intent",
+        "response_length": 37,
+        "duration": 0.3337,
+        "detected_intent": "chat",
+        "expected_intent": "STATUS",
+        "interaction_class": "NORMAL_CHAT"
+      }
+    },
+    {
+      "task_id": "e2e_005",
+      "category": "1_classification_intent",
+      "prompt": "Ziel: Systemstabilität um 20% erhöhen",
+      "ok": true,
+      "detail": {
+        "category": "1_classification_intent",
+        "response_length": 209,
+        "duration": 0.005,
+        "detected_intent": "goal_set",
+        "expected_intent": "GOAL_SET",
+        "interaction_class": "NORMAL_CHAT"
+      }
+    },
+    {
+      "task_id": "e2e_006",
+      "category": "1_classification_intent",
+      "prompt": "Zeige mir alle aktiven Ziele",
+      "ok": true,
+      "detail": {
+        "category": "1_classification_intent",
+        "response_length": 37,
+        "duration": 0.3344,
+        "detected_intent": "chat",
+        "expected_intent": "GOAL_LIST",
+        "interaction_class": "NORMAL_CHAT"
+      }
+    },
+    {
+      "task_id": "e2e_007",
+      "category": "1_classification_intent",
+      "prompt": "Suche nach den neuesten Trends bei AI-Agenten",
+      "ok": true,
+      "detail": {
+        "category": "1_classification_intent",
+        "response_length": 37,
+        "duration": 10.8618,
+        "detected_intent": "chat",
+        "expected_intent": "SEARCH",
+        "interaction_class": "TOOL_REQUEST"
+      }
+    },
+    {
+      "task_id": "e2e_008",
+      "category": "1_classification_intent",
+      "prompt": "Recherchiere aktuelle Sicherheitspatches für Linux",
+      "ok": true,
+      "detail": {
+        "category": "1_classification_intent",
+        "response_length": 37,
+        "duration": 0.636,
+        "detected_intent": "chat",
+        "expected_intent": "SEARCH",
+        "interaction_class": "TOOL_REQUEST"
+      }
+    },
+    {
+      "task_id": "e2e_009",
+      "category": "1_classification_intent",
+      "prompt": "Öffne GitHub und prüfe Pull Requests",
+      "ok": true,
+      "detail": {
+        "category": "1_classification_intent",
+        "response_length": 3722,
+        "duration": 4.7485,
+        "detected_intent": "chat",
+        "expected_intent": "BROWSER",
+        "interaction_class": "TOOL_REQUEST"
+      }
+    },
+    {
+      "task_id": "e2e_010",
+      "category": "1_classification_intent",
+      "prompt": "Übersetze diesen Text ins Englische: Isaac arbeitet autonom",
+      "ok": true,
+      "detail": {
+        "category": "1_classification_intent",
+        "response_length": 109,
+        "duration": 0.0084,
+        "detected_intent": "translate",
+        "expected_intent": "TRANSLATE",
+        "interaction_class": "NORMAL_CHAT"
+      }
+    },
+    {
+      "task_id": "e2e_011",
+      "category": "1_classification_intent",
+      "prompt": "Korrigiere die Syntaxfehler in main.py",
+      "ok": true,
+      "detail": {
+        "category": "1_classification_intent",
+        "response_length": 264,
+        "duration": 0.1733,
+        "detected_intent": "chat",
+        "expected_intent": "CODE",
+        "interaction_class": "NORMAL_CHAT"
+      }
+    },
+    {
+      "task_id": "e2e_012",
+      "category": "1_classification_intent",
+      "prompt": "Fakt: Der Server läuft im Rechenzentrum Frankfurt",
+      "ok": true,
+      "detail": {
+        "category": "1_classification_intent",
+        "response_length": 37,
+        "duration": 0.0018,
+        "detected_intent": "fact_set",
+        "expected_intent": "FACT_SET",
+        "interaction_class": "NORMAL_CHAT"
+      }
+    },
+    {
+      "task_id": "e2e_013",
+      "category": "1_classification_intent",
+      "prompt": "Direktive: Antworte immer präzise und strukturiert",
+      "ok": true,
+      "detail": {
+        "category": "1_classification_intent",
+        "response_length": 160,
+        "duration": 0.0044,
+        "detected_intent": "directive",
+        "expected_intent": "DIRECTIVE",
+        "interaction_class": "NORMAL_CHAT"
+      }
+    },
+    {
+      "task_id": "e2e_014",
+      "category": "1_classification_intent",
+      "prompt": "Was hälst du von autokorrigierenden Software-Pipelines?",
+      "ok": true,
+      "detail": {
+        "category": "1_classification_intent",
+        "response_length": 37,
+        "duration": 0.3531,
+        "detected_intent": "chat",
+        "expected_intent": "CHAT",
+        "interaction_class": "NORMAL_CHAT"
+      }
+    },
+    {
+      "task_id": "e2e_015",
+      "category": "1_classification_intent",
+      "prompt": "Erstelle eine Zusammenfassung der System-Architektur",
+      "ok": true,
+      "detail": {
+        "category": "1_classification_intent",
+        "response_length": 37,
+        "duration": 0.3391,
+        "detected_intent": "chat",
+        "expected_intent": "CODE",
+        "interaction_class": "NORMAL_CHAT"
+      }
+    },
+    {
+      "task_id": "e2e_016",
+      "category": "2_memory_context",
+      "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #16",
+      "ok": true,
+      "detail": {
+        "category": "2_memory_context",
+        "response_length": 37,
+        "duration": 0.3376,
+        "retrieval_context_built": true
+      }
+    },
+    {
+      "task_id": "e2e_017",
+      "category": "2_memory_context",
+      "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #17",
+      "ok": true,
+      "detail": {
+        "category": "2_memory_context",
+        "response_length": 37,
+        "duration": 0.3407,
+        "retrieval_context_built": true
+      }
+    },
+    {
+      "task_id": "e2e_018",
+      "category": "2_memory_context",
+      "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #18",
+      "ok": true,
+      "detail": {
+        "category": "2_memory_context",
+        "response_length": 129,
+        "duration": 0.3388,
+        "retrieval_context_built": true
+      }
+    },
+    {
+      "task_id": "e2e_019",
+      "category": "2_memory_context",
+      "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #19",
+      "ok": true,
+      "detail": {
+        "category": "2_memory_context",
+        "response_length": 129,
+        "duration": 0.3395,
+        "retrieval_context_built": true
+      }
+    },
+    {
+      "task_id": "e2e_020",
+      "category": "2_memory_context",
+      "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #20",
+      "ok": true,
+      "detail": {
+        "category": "2_memory_context",
+        "response_length": 129,
+        "duration": 0.3392,
+        "retrieval_context_built": true
+      }
+    },
+    {
+      "task_id": "e2e_021",
+      "category": "2_memory_context",
+      "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #21",
+      "ok": true,
+      "detail": {
+        "category": "2_memory_context",
+        "response_length": 129,
+        "duration": 0.3378,
+        "retrieval_context_built": true
+      }
+    },
+    {
+      "task_id": "e2e_022",
+      "category": "2_memory_context",
+      "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #22",
+      "ok": true,
+      "detail": {
+        "category": "2_memory_context",
+        "response_length": 129,
+        "duration": 0.3387,
+        "retrieval_context_built": true
+      }
+    },
+    {
+      "task_id": "e2e_023",
+      "category": "2_memory_context",
+      "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #23",
+      "ok": true,
+      "detail": {
+        "category": "2_memory_context",
+        "response_length": 129,
+        "duration": 0.3393,
+        "retrieval_context_built": true
+      }
+    },
+    {
+      "task_id": "e2e_024",
+      "category": "2_memory_context",
+      "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #24",
+      "ok": true,
+      "detail": {
+        "category": "2_memory_context",
+        "response_length": 129,
+        "duration": 0.3381,
+        "retrieval_context_built": true
+      }
+    },
+    {
+      "task_id": "e2e_025",
+      "category": "2_memory_context",
+      "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #25",
+      "ok": true,
+      "detail": {
+        "category": "2_memory_context",
+        "response_length": 129,
+        "duration": 0.3401,
+        "retrieval_context_built": true
+      }
+    },
+    {
+      "task_id": "e2e_026",
+      "category": "2_memory_context",
+      "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #26",
+      "ok": true,
+      "detail": {
+        "category": "2_memory_context",
+        "response_length": 129,
+        "duration": 0.342,
+        "retrieval_context_built": true
+      }
+    },
+    {
+      "task_id": "e2e_027",
+      "category": "2_memory_context",
+      "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #27",
+      "ok": true,
+      "detail": {
+        "category": "2_memory_context",
+        "response_length": 129,
+        "duration": 0.3406,
+        "retrieval_context_built": true
+      }
+    },
+    {
+      "task_id": "e2e_028",
+      "category": "2_memory_context",
+      "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #28",
+      "ok": true,
+      "detail": {
+        "category": "2_memory_context",
+        "response_length": 129,
+        "duration": 0.3397,
+        "retrieval_context_built": true
+      }
+    },
+    {
+      "task_id": "e2e_029",
+      "category": "2_memory_context",
+      "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #29",
+      "ok": true,
+      "detail": {
+        "category": "2_memory_context",
+        "response_length": 129,
+        "duration": 0.3405,
+        "retrieval_context_built": true
+      }
+    },
+    {
+      "task_id": "e2e_030",
+      "category": "2_memory_context",
+      "prompt": "Rufe gespeicherte Informationen und Direktiven ab für Kontext-Prüfung #30",
+      "ok": true,
+      "detail": {
+        "category": "2_memory_context",
+        "response_length": 129,
+        "duration": 0.3421,
+        "retrieval_context_built": true
+      }
+    },
+    {
+      "task_id": "e2e_031",
+      "category": "3_strategy_decomposition",
+      "prompt": "Analysiere die Aufgabenstellung #31 und erstelle eine geeignete Ausführungsstrategie",
+      "ok": true,
+      "detail": {
+        "category": "3_strategy_decomposition",
+        "response_length": 37,
+        "duration": 0.3374,
+        "strategy_response_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_032",
+      "category": "3_strategy_decomposition",
+      "prompt": "Analysiere die Aufgabenstellung #32 und erstelle eine geeignete Ausführungsstrategie",
+      "ok": true,
+      "detail": {
+        "category": "3_strategy_decomposition",
+        "response_length": 37,
+        "duration": 0.3382,
+        "strategy_response_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_033",
+      "category": "3_strategy_decomposition",
+      "prompt": "Analysiere die Aufgabenstellung #33 und erstelle eine geeignete Ausführungsstrategie",
+      "ok": true,
+      "detail": {
+        "category": "3_strategy_decomposition",
+        "response_length": 129,
+        "duration": 0.3389,
+        "strategy_response_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_034",
+      "category": "3_strategy_decomposition",
+      "prompt": "Analysiere die Aufgabenstellung #34 und erstelle eine geeignete Ausführungsstrategie",
+      "ok": true,
+      "detail": {
+        "category": "3_strategy_decomposition",
+        "response_length": 129,
+        "duration": 0.3371,
+        "strategy_response_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_035",
+      "category": "3_strategy_decomposition",
+      "prompt": "Analysiere die Aufgabenstellung #35 und erstelle eine geeignete Ausführungsstrategie",
+      "ok": true,
+      "detail": {
+        "category": "3_strategy_decomposition",
+        "response_length": 129,
+        "duration": 0.3381,
+        "strategy_response_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_036",
+      "category": "3_strategy_decomposition",
+      "prompt": "Analysiere die Aufgabenstellung #36 und erstelle eine geeignete Ausführungsstrategie",
+      "ok": true,
+      "detail": {
+        "category": "3_strategy_decomposition",
+        "response_length": 129,
+        "duration": 0.3385,
+        "strategy_response_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_037",
+      "category": "3_strategy_decomposition",
+      "prompt": "Analysiere die Aufgabenstellung #37 und erstelle eine geeignete Ausführungsstrategie",
+      "ok": true,
+      "detail": {
+        "category": "3_strategy_decomposition",
+        "response_length": 129,
+        "duration": 0.3392,
+        "strategy_response_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_038",
+      "category": "3_strategy_decomposition",
+      "prompt": "Analysiere die Aufgabenstellung #38 und erstelle eine geeignete Ausführungsstrategie",
+      "ok": true,
+      "detail": {
+        "category": "3_strategy_decomposition",
+        "response_length": 129,
+        "duration": 0.3394,
+        "strategy_response_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_039",
+      "category": "3_strategy_decomposition",
+      "prompt": "Analysiere die Aufgabenstellung #39 und erstelle eine geeignete Ausführungsstrategie",
+      "ok": true,
+      "detail": {
+        "category": "3_strategy_decomposition",
+        "response_length": 129,
+        "duration": 0.3398,
+        "strategy_response_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_040",
+      "category": "3_strategy_decomposition",
+      "prompt": "Analysiere die Aufgabenstellung #40 und erstelle eine geeignete Ausführungsstrategie",
+      "ok": true,
+      "detail": {
+        "category": "3_strategy_decomposition",
+        "response_length": 129,
+        "duration": 0.3381,
+        "strategy_response_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_041",
+      "category": "3_strategy_decomposition",
+      "prompt": "Analysiere die Aufgabenstellung #41 und erstelle eine geeignete Ausführungsstrategie",
+      "ok": true,
+      "detail": {
+        "category": "3_strategy_decomposition",
+        "response_length": 129,
+        "duration": 0.341,
+        "strategy_response_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_042",
+      "category": "3_strategy_decomposition",
+      "prompt": "Analysiere die Aufgabenstellung #42 und erstelle eine geeignete Ausführungsstrategie",
+      "ok": true,
+      "detail": {
+        "category": "3_strategy_decomposition",
+        "response_length": 129,
+        "duration": 0.339,
+        "strategy_response_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_043",
+      "category": "3_strategy_decomposition",
+      "prompt": "Analysiere die Aufgabenstellung #43 und erstelle eine geeignete Ausführungsstrategie",
+      "ok": true,
+      "detail": {
+        "category": "3_strategy_decomposition",
+        "response_length": 129,
+        "duration": 0.339,
+        "strategy_response_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_044",
+      "category": "3_strategy_decomposition",
+      "prompt": "Analysiere die Aufgabenstellung #44 und erstelle eine geeignete Ausführungsstrategie",
+      "ok": true,
+      "detail": {
+        "category": "3_strategy_decomposition",
+        "response_length": 129,
+        "duration": 0.3379,
+        "strategy_response_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_045",
+      "category": "3_strategy_decomposition",
+      "prompt": "Analysiere die Aufgabenstellung #45 und erstelle eine geeignete Ausführungsstrategie",
+      "ok": true,
+      "detail": {
+        "category": "3_strategy_decomposition",
+        "response_length": 129,
+        "duration": 0.338,
+        "strategy_response_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_046",
+      "category": "4_governance_security",
+      "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #46",
+      "ok": true,
+      "detail": {
+        "category": "4_governance_security",
+        "response_length": 37,
+        "duration": 0.3372,
+        "require_sudo": false,
+        "governance_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_047",
+      "category": "4_governance_security",
+      "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #47",
+      "ok": true,
+      "detail": {
+        "category": "4_governance_security",
+        "response_length": 37,
+        "duration": 0.3361,
+        "require_sudo": false,
+        "governance_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_048",
+      "category": "4_governance_security",
+      "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #48",
+      "ok": true,
+      "detail": {
+        "category": "4_governance_security",
+        "response_length": 129,
+        "duration": 0.3382,
+        "require_sudo": true,
+        "governance_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_049",
+      "category": "4_governance_security",
+      "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #49",
+      "ok": true,
+      "detail": {
+        "category": "4_governance_security",
+        "response_length": 129,
+        "duration": 0.3375,
+        "require_sudo": false,
+        "governance_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_050",
+      "category": "4_governance_security",
+      "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #50",
+      "ok": true,
+      "detail": {
+        "category": "4_governance_security",
+        "response_length": 129,
+        "duration": 0.3385,
+        "require_sudo": false,
+        "governance_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_051",
+      "category": "4_governance_security",
+      "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #51",
+      "ok": true,
+      "detail": {
+        "category": "4_governance_security",
+        "response_length": 129,
+        "duration": 0.3372,
+        "require_sudo": true,
+        "governance_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_052",
+      "category": "4_governance_security",
+      "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #52",
+      "ok": true,
+      "detail": {
+        "category": "4_governance_security",
+        "response_length": 129,
+        "duration": 0.3384,
+        "require_sudo": false,
+        "governance_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_053",
+      "category": "4_governance_security",
+      "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #53",
+      "ok": true,
+      "detail": {
+        "category": "4_governance_security",
+        "response_length": 129,
+        "duration": 0.3382,
+        "require_sudo": false,
+        "governance_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_054",
+      "category": "4_governance_security",
+      "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #54",
+      "ok": true,
+      "detail": {
+        "category": "4_governance_security",
+        "response_length": 129,
+        "duration": 0.3393,
+        "require_sudo": true,
+        "governance_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_055",
+      "category": "4_governance_security",
+      "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #55",
+      "ok": true,
+      "detail": {
+        "category": "4_governance_security",
+        "response_length": 129,
+        "duration": 0.3361,
+        "require_sudo": false,
+        "governance_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_056",
+      "category": "4_governance_security",
+      "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #56",
+      "ok": true,
+      "detail": {
+        "category": "4_governance_security",
+        "response_length": 129,
+        "duration": 0.3374,
+        "require_sudo": false,
+        "governance_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_057",
+      "category": "4_governance_security",
+      "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #57",
+      "ok": true,
+      "detail": {
+        "category": "4_governance_security",
+        "response_length": 129,
+        "duration": 0.3367,
+        "require_sudo": true,
+        "governance_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_058",
+      "category": "4_governance_security",
+      "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #58",
+      "ok": true,
+      "detail": {
+        "category": "4_governance_security",
+        "response_length": 129,
+        "duration": 0.3386,
+        "require_sudo": false,
+        "governance_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_059",
+      "category": "4_governance_security",
+      "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #59",
+      "ok": true,
+      "detail": {
+        "category": "4_governance_security",
+        "response_length": 129,
+        "duration": 0.3365,
+        "require_sudo": false,
+        "governance_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_060",
+      "category": "4_governance_security",
+      "prompt": "Sicherheitsüberprüfung und Privilegien-Prüfung für Befehl #60",
+      "ok": true,
+      "detail": {
+        "category": "4_governance_security",
+        "response_length": 129,
+        "duration": 0.3369,
+        "require_sudo": true,
+        "governance_ok": true
+      }
+    },
+    {
+      "task_id": "e2e_061",
+      "category": "5_execution_taskgraph",
+      "prompt": "Führe komplexe mehrstufige Aufgabe #61 über den TaskGraph aus",
+      "ok": true,
+      "detail": {
+        "category": "5_execution_taskgraph",
+        "response_length": 37,
+        "duration": 0.3406,
+        "graph_nodes": 2
+      }
+    },
+    {
+      "task_id": "e2e_062",
+      "category": "5_execution_taskgraph",
+      "prompt": "Führe komplexe mehrstufige Aufgabe #62 über den TaskGraph aus",
+      "ok": true,
+      "detail": {
+        "category": "5_execution_taskgraph",
+        "response_length": 37,
+        "duration": 0.3396,
+        "graph_nodes": 1
+      }
+    },
+    {
+      "task_id": "e2e_063",
+      "category": "5_execution_taskgraph",
+      "prompt": "Führe komplexe mehrstufige Aufgabe #63 über den TaskGraph aus",
+      "ok": true,
+      "detail": {
+        "category": "5_execution_taskgraph",
+        "response_length": 129,
+        "duration": 0.343,
+        "graph_nodes": 2
+      }
+    },
+    {
+      "task_id": "e2e_064",
+      "category": "5_execution_taskgraph",
+      "prompt": "Führe komplexe mehrstufige Aufgabe #64 über den TaskGraph aus",
+      "ok": true,
+      "detail": {
+        "category": "5_execution_taskgraph",
+        "response_length": 129,
+        "duration": 0.341,
+        "graph_nodes": 1
+      }
+    },
+    {
+      "task_id": "e2e_065",
+      "category": "5_execution_taskgraph",
+      "prompt": "Führe komplexe mehrstufige Aufgabe #65 über den TaskGraph aus",
+      "ok": true,
+      "detail": {
+        "category": "5_execution_taskgraph",
+        "response_length": 129,
+        "duration": 0.3409,
+        "graph_nodes": 2
+      }
+    },
+    {
+      "task_id": "e2e_066",
+      "category": "5_execution_taskgraph",
+      "prompt": "Führe komplexe mehrstufige Aufgabe #66 über den TaskGraph aus",
+      "ok": true,
+      "detail": {
+        "category": "5_execution_taskgraph",
+        "response_length": 129,
+        "duration": 0.3404,
+        "graph_nodes": 1
+      }
+    },
+    {
+      "task_id": "e2e_067",
+      "category": "5_execution_taskgraph",
+      "prompt": "Führe komplexe mehrstufige Aufgabe #67 über den TaskGraph aus",
+      "ok": true,
+      "detail": {
+        "category": "5_execution_taskgraph",
+        "response_length": 129,
+        "duration": 0.3403,
+        "graph_nodes": 2
+      }
+    },
+    {
+      "task_id": "e2e_068",
+      "category": "5_execution_taskgraph",
+      "prompt": "Führe komplexe mehrstufige Aufgabe #68 über den TaskGraph aus",
+      "ok": true,
+      "detail": {
+        "category": "5_execution_taskgraph",
+        "response_length": 129,
+        "duration": 0.3413,
+        "graph_nodes": 1
+      }
+    },
+    {
+      "task_id": "e2e_069",
+      "category": "5_execution_taskgraph",
+      "prompt": "Führe komplexe mehrstufige Aufgabe #69 über den TaskGraph aus",
+      "ok": true,
+      "detail": {
+        "category": "5_execution_taskgraph",
+        "response_length": 129,
+        "duration": 0.3383,
+        "graph_nodes": 2
+      }
+    },
+    {
+      "task_id": "e2e_070",
+      "category": "5_execution_taskgraph",
+      "prompt": "Führe komplexe mehrstufige Aufgabe #70 über den TaskGraph aus",
+      "ok": true,
+      "detail": {
+        "category": "5_execution_taskgraph",
+        "response_length": 129,
+        "duration": 0.3398,
+        "graph_nodes": 1
+      }
+    },
+    {
+      "task_id": "e2e_071",
+      "category": "5_execution_taskgraph",
+      "prompt": "Führe komplexe mehrstufige Aufgabe #71 über den TaskGraph aus",
+      "ok": true,
+      "detail": {
+        "category": "5_execution_taskgraph",
+        "response_length": 129,
+        "duration": 0.3399,
+        "graph_nodes": 2
+      }
+    },
+    {
+      "task_id": "e2e_072",
+      "category": "5_execution_taskgraph",
+      "prompt": "Führe komplexe mehrstufige Aufgabe #72 über den TaskGraph aus",
+      "ok": true,
+      "detail": {
+        "category": "5_execution_taskgraph",
+        "response_length": 129,
+        "duration": 0.3385,
+        "graph_nodes": 1
+      }
+    },
+    {
+      "task_id": "e2e_073",
+      "category": "5_execution_taskgraph",
+      "prompt": "Führe komplexe mehrstufige Aufgabe #73 über den TaskGraph aus",
+      "ok": true,
+      "detail": {
+        "category": "5_execution_taskgraph",
+        "response_length": 129,
+        "duration": 0.3404,
+        "graph_nodes": 2
+      }
+    },
+    {
+      "task_id": "e2e_074",
+      "category": "5_execution_taskgraph",
+      "prompt": "Führe komplexe mehrstufige Aufgabe #74 über den TaskGraph aus",
+      "ok": true,
+      "detail": {
+        "category": "5_execution_taskgraph",
+        "response_length": 129,
+        "duration": 0.3409,
+        "graph_nodes": 1
+      }
+    },
+    {
+      "task_id": "e2e_075",
+      "category": "5_execution_taskgraph",
+      "prompt": "Führe komplexe mehrstufige Aufgabe #75 über den TaskGraph aus",
+      "ok": true,
+      "detail": {
+        "category": "5_execution_taskgraph",
+        "response_length": 129,
+        "duration": 0.3392,
+        "graph_nodes": 2
+      }
+    },
+    {
+      "task_id": "e2e_076",
+      "category": "6_evaluation_selfcorrection",
+      "prompt": "Bewerte die Antwortqualität und führe bei Bedarf Selbstkorrektur durch für Fall #76",
+      "ok": true,
+      "detail": {
+        "category": "6_evaluation_selfcorrection",
+        "response_length": 37,
+        "duration": 0.3416,
+        "score": 0.88
+      }
+    },
+    {
+      "task_id": "e2e_077",
+      "category": "6_evaluation_selfcorrection",
+      "prompt": "Bewerte die Antwortqualität und führe bei Bedarf Selbstkorrektur durch für Fall #77",
+      "ok": true,
+      "detail": {
+        "category": "6_evaluation_selfcorrection",
+        "response_length": 37,
+        "duration": 0.3426,
+        "score": 0.88
+      }
+    },
+    {
+      "task_id": "e2e_078",
+      "category": "6_evaluation_selfcorrection",
+      "prompt": "Bewerte die Antwortqualität und führe bei Bedarf Selbstkorrektur durch für Fall #78",
+      "ok": true,
+      "detail": {
+        "category": "6_evaluation_selfcorrection",
+        "response_length": 129,
+        "duration": 0.3422,
+        "score": 0.88
+      }
+    },
+    {
+      "task_id": "e2e_079",
+      "category": "6_evaluation_selfcorrection",
+      "prompt": "Bewerte die Antwortqualität und führe bei Bedarf Selbstkorrektur durch für Fall #79",
+      "ok": true,
+      "detail": {
+        "category": "6_evaluation_selfcorrection",
+        "response_length": 129,
+        "duration": 0.3408,
+        "score": 0.88
+      }
+    },
+    {
+      "task_id": "e2e_080",
+      "category": "6_evaluation_selfcorrection",
+      "prompt": "Bewerte die Antwortqualität und führe bei Bedarf Selbstkorrektur durch für Fall #80",
+      "ok": true,
+      "detail": {
+        "category": "6_evaluation_selfcorrection",
+        "response_length": 129,
+        "duration": 0.343,
+        "score": 0.88
+      }
+    },
+    {
+      "task_id": "e2e_081",
+      "category": "6_evaluation_selfcorrection",
+      "prompt": "Bewerte die Antwortqualität und führe bei Bedarf Selbstkorrektur durch für Fall #81",
+      "ok": true,
+      "detail": {
+        "category": "6_evaluation_selfcorrection",
+        "response_length": 129,
+        "duration": 0.3421,
+        "score": 0.88
+      }
+    },
+    {
+      "task_id": "e2e_082",
+      "category": "6_evaluation_selfcorrection",
+      "prompt": "Bewerte die Antwortqualität und führe bei Bedarf Selbstkorrektur durch für Fall #82",
+      "ok": true,
+      "detail": {
+        "category": "6_evaluation_selfcorrection",
+        "response_length": 129,
+        "duration": 0.3423,
+        "score": 0.88
+      }
+    },
+    {
+      "task_id": "e2e_083",
+      "category": "6_evaluation_selfcorrection",
+      "prompt": "Bewerte die Antwortqualität und führe bei Bedarf Selbstkorrektur durch für Fall #83",
+      "ok": true,
+      "detail": {
+        "category": "6_evaluation_selfcorrection",
+        "response_length": 129,
+        "duration": 0.3403,
+        "score": 0.88
+      }
+    },
+    {
+      "task_id": "e2e_084",
+      "category": "6_evaluation_selfcorrection",
+      "prompt": "Bewerte die Antwortqualität und führe bei Bedarf Selbstkorrektur durch für Fall #84",
+      "ok": true,
+      "detail": {
+        "category": "6_evaluation_selfcorrection",
+        "response_length": 129,
+        "duration": 0.3407,
+        "score": 0.88
+      }
+    },
+    {
+      "task_id": "e2e_085",
+      "category": "6_evaluation_selfcorrection",
+      "prompt": "Bewerte die Antwortqualität und führe bei Bedarf Selbstkorrektur durch für Fall #85",
+      "ok": true,
+      "detail": {
+        "category": "6_evaluation_selfcorrection",
+        "response_length": 129,
+        "duration": 0.3432,
+        "score": 0.88
+      }
+    },
+    {
+      "task_id": "e2e_086",
+      "category": "7_decision_trace",
+      "prompt": "Zeichne alle Entschungsschritte in DecisionTrace auf und anonymisiere vertrauliche Daten in Fall #86",
+      "ok": true,
+      "detail": {
+        "category": "7_decision_trace",
+        "response_length": 103,
+        "duration": 0.3411,
+        "phases_count": 12,
+        "redacted": true
+      }
+    },
+    {
+      "task_id": "e2e_087",
+      "category": "7_decision_trace",
+      "prompt": "Zeichne alle Entschungsschritte in DecisionTrace auf und anonymisiere vertrauliche Daten in Fall #87",
+      "ok": true,
+      "detail": {
+        "category": "7_decision_trace",
+        "response_length": 103,
+        "duration": 0.3392,
+        "phases_count": 12,
+        "redacted": true
+      }
+    },
+    {
+      "task_id": "e2e_088",
+      "category": "7_decision_trace",
+      "prompt": "Zeichne alle Entschungsschritte in DecisionTrace auf und anonymisiere vertrauliche Daten in Fall #88",
+      "ok": true,
+      "detail": {
+        "category": "7_decision_trace",
+        "response_length": 129,
+        "duration": 0.3404,
+        "phases_count": 12,
+        "redacted": true
+      }
+    },
+    {
+      "task_id": "e2e_089",
+      "category": "7_decision_trace",
+      "prompt": "Zeichne alle Entschungsschritte in DecisionTrace auf und anonymisiere vertrauliche Daten in Fall #89",
+      "ok": true,
+      "detail": {
+        "category": "7_decision_trace",
+        "response_length": 129,
+        "duration": 0.3397,
+        "phases_count": 12,
+        "redacted": true
+      }
+    },
+    {
+      "task_id": "e2e_090",
+      "category": "7_decision_trace",
+      "prompt": "Zeichne alle Entschungsschritte in DecisionTrace auf und anonymisiere vertrauliche Daten in Fall #90",
+      "ok": true,
+      "detail": {
+        "category": "7_decision_trace",
+        "response_length": 129,
+        "duration": 0.3398,
+        "phases_count": 12,
+        "redacted": true
+      }
+    },
+    {
+      "task_id": "e2e_091",
+      "category": "7_decision_trace",
+      "prompt": "Zeichne alle Entschungsschritte in DecisionTrace auf und anonymisiere vertrauliche Daten in Fall #91",
+      "ok": true,
+      "detail": {
+        "category": "7_decision_trace",
+        "response_length": 129,
+        "duration": 0.3418,
+        "phases_count": 12,
+        "redacted": true
+      }
+    },
+    {
+      "task_id": "e2e_092",
+      "category": "7_decision_trace",
+      "prompt": "Zeichne alle Entschungsschritte in DecisionTrace auf und anonymisiere vertrauliche Daten in Fall #92",
+      "ok": true,
+      "detail": {
+        "category": "7_decision_trace",
+        "response_length": 129,
+        "duration": 0.3407,
+        "phases_count": 12,
+        "redacted": true
+      }
+    },
+    {
+      "task_id": "e2e_093",
+      "category": "8_learning_commit",
+      "prompt": "Extrahiere verallgemeinerbare Erfolgsmuster und erstelle einen Learning-Commit für Fall #93",
+      "ok": true,
+      "detail": {
+        "category": "8_learning_commit",
+        "response_length": 37,
+        "duration": 0.342,
+        "commit_hash": "2b14d7601f42c63e"
+      }
+    },
+    {
+      "task_id": "e2e_094",
+      "category": "8_learning_commit",
+      "prompt": "Extrahiere verallgemeinerbare Erfolgsmuster und erstelle einen Learning-Commit für Fall #94",
+      "ok": true,
+      "detail": {
+        "category": "8_learning_commit",
+        "response_length": 37,
+        "duration": 0.3413,
+        "commit_hash": "d956a24dd5095786"
+      }
+    },
+    {
+      "task_id": "e2e_095",
+      "category": "8_learning_commit",
+      "prompt": "Extrahiere verallgemeinerbare Erfolgsmuster und erstelle einen Learning-Commit für Fall #95",
+      "ok": true,
+      "detail": {
+        "category": "8_learning_commit",
+        "response_length": 129,
+        "duration": 0.3418,
+        "commit_hash": "94fc4b18cce6c148"
+      }
+    },
+    {
+      "task_id": "e2e_096",
+      "category": "8_learning_commit",
+      "prompt": "Extrahiere verallgemeinerbare Erfolgsmuster und erstelle einen Learning-Commit für Fall #96",
+      "ok": true,
+      "detail": {
+        "category": "8_learning_commit",
+        "response_length": 129,
+        "duration": 0.3418,
+        "commit_hash": "9478a84c7868c510"
+      }
+    },
+    {
+      "task_id": "e2e_097",
+      "category": "8_learning_commit",
+      "prompt": "Extrahiere verallgemeinerbare Erfolgsmuster und erstelle einen Learning-Commit für Fall #97",
+      "ok": true,
+      "detail": {
+        "category": "8_learning_commit",
+        "response_length": 129,
+        "duration": 0.344,
+        "commit_hash": "de3c4d22b272021b"
+      }
+    },
+    {
+      "task_id": "e2e_098",
+      "category": "8_learning_commit",
+      "prompt": "Extrahiere verallgemeinerbare Erfolgsmuster und erstelle einen Learning-Commit für Fall #98",
+      "ok": true,
+      "detail": {
+        "category": "8_learning_commit",
+        "response_length": 129,
+        "duration": 0.3409,
+        "commit_hash": "f0e405b47e15df70"
+      }
+    },
+    {
+      "task_id": "e2e_099",
+      "category": "8_learning_commit",
+      "prompt": "Extrahiere verallgemeinerbare Erfolgsmuster und erstelle einen Learning-Commit für Fall #99",
+      "ok": true,
+      "detail": {
+        "category": "8_learning_commit",
+        "response_length": 129,
+        "duration": 0.341,
+        "commit_hash": "fda1be03b2c95ac3"
+      }
+    },
+    {
+      "task_id": "e2e_100",
+      "category": "8_learning_commit",
+      "prompt": "Extrahiere verallgemeinerbare Erfolgsmuster und erstelle einen Learning-Commit für Fall #100",
+      "ok": true,
+      "detail": {
+        "category": "8_learning_commit",
+        "response_length": 129,
+        "duration": 0.3426,
+        "commit_hash": "6f40941dc39cd014"
+      }
+    }
+  ]
+}

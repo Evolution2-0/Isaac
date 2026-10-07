@@ -23,6 +23,7 @@ Auto-Login:
   - Pro Domain: Username, Passwort, Login-URL, Selektoren
   - Wird beim Start automatisch durchgeführt
 """
+from __future__ import annotations
 
 import asyncio
 import json
@@ -350,9 +351,15 @@ class BrowserManager:
         self._browser   = None   # chromium browser
         self._creds:    dict[str, LoginProfile] = {}
         self._bereit    = False
-        self._lock      = asyncio.Lock()
+        self._lock_obj  = None
         self._load_creds()
         log.info("BrowserManager initialisiert")
+
+    @property
+    def _lock(self) -> asyncio.Lock:
+        if self._lock_obj is None:
+            self._lock_obj = asyncio.Lock()
+        return self._lock_obj
 
     def _browser_allowed(self, url: str = "") -> bool:
         if not self.cfg.browser_automation:

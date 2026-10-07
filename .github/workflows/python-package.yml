@@ -53,7 +53,8 @@ jobs:
           python -m unittest \
             tests_phase_a_stabilization \
             tests_state_io \
-            tests_provider_configuration
+            tests_provider_configuration \
+            tests_jules_agent
 
       - name: Run eval harness
         run: python -m evals.eval_runner

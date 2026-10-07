@@ -30,6 +30,14 @@ EXPECTED_TOOLS = frozenset({
     "isaac.start_task",
     "isaac.search_web",
     "isaac.run_browser_action",
+    "isaac.goal_list",
+    "isaac.goal_get",
+    "isaac.goal_update",
+    "isaac.permission_check",
+    "isaac.safety_check",
+    "isaac.action_request",
+    "isaac.autonomy_evaluate",
+    "isaac.notification_send",
 })
 
 EXPECTED_RESOURCES = frozenset({

@@ -40,7 +40,7 @@
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^25.3.5",
     "@types/react": "^19.2.14",
-    "postcss": "^8.5.23",
+    "postcss": "^8.5.24",
     "tailwindcss": "^4.2.1",
     "typescript": "^5.9.3"
   }

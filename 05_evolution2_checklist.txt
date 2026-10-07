@@ -9,7 +9,7 @@ Open-Source-Muster nur als *bounded patterns* übernehmen (kein wholesale Framew
 ──────────────────────────────────────────────────────────────────────────────
 E2.0 GATE 0 — SYNC & BASELINE
 ──────────────────────────────────────────────────────────────────────────────
-[x] 0.1 origin/main (glinkasteffen075-bit/Isaac) = kanonisch
+[x] 0.1 origin/main (hansheute88/isaac) = kanonisch
 [x] 0.2 sco0rp/IsaacNew main mit origin/main synchronisiert
 [x] 0.3 Lokale Secrets aus Code entfernt (owner_login_probe Defaults)
 [x] 0.4 Baseline: py_compile + sanity_check + unittest grün
@@ -57,7 +57,7 @@ E2.0.5 RELEASE-DISZIPLIN
 ──────────────────────────────────────────────────────────────────────────────
 [x] 5.1 Validierung A–G (replay_eval) grün
 [x] 5.2 unittest (217) + eval_runner (66/66) + sanity_check lokal grün
-[x] 5.3 PR gegen main: https://github.com/glinkasteffen075-bit/Isaac/pull/24
+[x] 5.3 PR gegen main: https://github.com/hansheute88/isaac/pull/24
 [!] 5.4 GitHub Actions: Account-Billing-Lock (CI Jobs starten nicht) — lokal validiert
 [x] 5.5 Snapshot: evals/e2_validation_snapshot.json
 [x] 5.6 E2.0 Constitution-Pfad lokal RELEASE-READY (Merge nach Billing/CI oder explizitem Owner-OK)

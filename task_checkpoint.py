@@ -120,6 +120,7 @@ ALLOWED_SOFT_TRANSITIONS: dict[str, frozenset[str]] = {
         CheckpointState.PLANNING,
         CheckpointState.TOOL_PENDING,
         CheckpointState.EVALUATING,
+        CheckpointState.LEARNING_COMMIT,
     }),
 }
 

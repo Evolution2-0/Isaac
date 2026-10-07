@@ -31,6 +31,7 @@ Fragmentierungsprinzipien:
   3. Fragments erscheinen als unabhängige akademische Anfragen
   4. Skill-Mapping: Jedes Fragment geht zur kompetentesten Instanz
 """
+from __future__ import annotations
 
 import asyncio
 import re
@@ -38,7 +39,7 @@ import time
 import logging
 import hashlib
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, Any
 
 from config    import get_config
 from audit     import AuditLog
@@ -80,9 +81,22 @@ class AtomicDecomposer:
     """
 
     def __init__(self):
-        self.router = get_skill_router()
-        self.cfg    = get_config()
+        self.router   = get_skill_router()
+        self.cfg      = get_config()
+        self._executor= None   # lazy
         log.info("AtomicDecomposer online")
+
+    def _get_executor(self):
+        if not self._executor:
+            from executor import get_executor
+            self._executor = get_executor()
+        return self._executor
+
+    def atomisiere(self, prompt: str) -> list[str]:
+        """Gibt neutrale Teilprompts zurück (sync, ohne externe KI-Calls)."""
+        analyse   = self._analysiere_prompt(prompt)
+        fragmente = self._erstelle_fragmente(prompt, analyse)
+        return [f.prompt for f in fragmente]
 
     # ── Haupt-Methode ─────────────────────────────────────────────────────────
     async def decompose_and_execute(
@@ -90,6 +104,8 @@ class AtomicDecomposer:
         steffen_prompt:  str,
         verfuegbare_ids: list[str],
         stagger_ms:      int = 1500,
+        classification:  Optional[Any] = None,
+        strategy:        Optional[Any] = None,
     ) -> DecomposeResult:
         """
         1. Prompt analysieren
@@ -110,8 +126,17 @@ class AtomicDecomposer:
             f"hash={original_hash} instanzen={len(verfuegbare_ids)}"
         )
 
-        # Analyse: Was braucht dieser Prompt?
-        analyse = self._analysiere_prompt(steffen_prompt)
+        # Analyse: Was braucht dieser Prompt? (Klassifikation aus Core wiederverwenden wenn möglich)
+        if classification and hasattr(classification, "interaction_class"):
+            analyse = {
+                "typ": "erklaerung" if getattr(classification, "interaction_class", "") == "GENERAL_KNOWLEDGE" else "faktenfrage",
+                "komplexitaet": min(1.0, len(steffen_prompt.split()) / 50.0),
+                "skills": ["faktenwissen", "reasoning"],
+                "zeitbezug": False,
+                "mehrere_themen": len(steffen_prompt.split()) > 15,
+            }
+        else:
+            analyse = self._analysiere_prompt(steffen_prompt)
 
         # Fragmente erstellen
         fragmente = self._erstelle_fragmente(steffen_prompt, analyse)
@@ -405,8 +430,8 @@ class AtomicDecomposer:
             return 'openrouter', self._select_openrouter_model(fragment)
         return None, None
 
-    async def _execute_fragment(self, fragment: Fragment, delay: float):
-        """Führt ein einzelnes Fragment aus."""
+    async def _execute_fragment(self, fragment: Fragment, delay: float, parent_id: Optional[str] = None):
+        """Führt ein einzelnes Fragment über den Executor aus."""
         await asyncio.sleep(delay)
 
         t0 = time.monotonic()
@@ -427,18 +452,27 @@ class AtomicDecomposer:
                     )
                     return
 
-            # Fallback: API-Provider
-            from relay import get_relay
-            antwort, prov = await get_relay().ask_with_fallback(
-                fragment.prompt,
-                system = (
-                    "Du bist ein Wissens-Assistent. "
-                    "Beantworte die Frage vollständig und sachlich."
+            # Sub-Task über Executor ausführen
+            executor = self._get_executor()
+            from executor import TaskType, Strategy
+            provider, model = self._select_provider_for_fragment(fragment)
+            task = executor.create_task(
+                typ=TaskType.CHAT,
+                prompt=fragment.prompt,
+                beschreibung=f"fragment_subtask:{fragment.id}:{fragment.prompt[:40]}",
+                provider=provider or fragment.instanz_id or None,
+                parent_id=parent_id,
+                system_prompt="Du bist ein Wissens-Assistent. Beantworte die Frage vollständig und sachlich.",
+                strategy=Strategy(
+                    allow_tools=False,
+                    allow_followup=False,
+                    allow_provider_switch=True,
                 ),
             )
-            fragment.antwort     = antwort
-            fragment.instanz_id  = fragment.instanz_id or prov
-            fragment.latenz      = time.monotonic() - t0
+            task = await executor.submit_and_wait(task, timeout=120.0)
+            fragment.antwort    = task.antwort or task.fehler or "[Keine Antwort]"
+            fragment.instanz_id = fragment.instanz_id or task.provider_used
+            fragment.latenz     = time.monotonic() - t0
 
         except Exception as e:
             fragment.fehler  = True

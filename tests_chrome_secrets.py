@@ -135,6 +135,7 @@ class TestLiveDecryptHelpers(unittest.TestCase):
     def test_cookie_jar_write(self):
         from chrome_secrets import items_to_cookie_jar, write_cookie_jar
         from pathlib import Path
+        from unittest import mock
 
         items = [
             {"host": ".google.com", "name": "SID", "value": "abc123session"},
@@ -144,7 +145,8 @@ class TestLiveDecryptHelpers(unittest.TestCase):
         entries = items_to_cookie_jar(items)
         self.assertEqual(len(entries), 2)
         self.assertTrue(all(e["name"] != "access_token" for e in entries))
-        written = write_cookie_jar(entries, basename="test_cookies")
+        with mock.patch("chrome_secrets.is_owner_equivalent_mode", return_value=True):
+            written = write_cookie_jar(entries, basename="test_cookies")
         self.assertTrue(written["ok"])
         p = Path(written["netscape_path"])
         self.assertTrue(p.exists())

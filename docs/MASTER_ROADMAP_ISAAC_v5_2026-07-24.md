@@ -1,7 +1,7 @@
 # ISAAC Master Roadmap v5
 
 **Stand:** 2026-07-24  
-**Code-Basis:** `main` @ `ff5ab7b` (glinkasteffen075-bit/Isaac + sco0rp/IsaacNew sync)  
+**Code-Basis:** `main` @ `ff5ab7b` (hansheute88/isaac + sco0rp/IsaacNew sync)  
 **Aktive Disziplin (AGENTS.md):** *Consolidate core behavior* — nicht Feature-Expansion  
 **Kernel:** v5.3 · Pipeline `classify → retrieve → strategy → task → execute → evaluate → memory`
 

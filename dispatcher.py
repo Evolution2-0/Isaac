@@ -26,13 +26,14 @@ Cross-Validation:
    Nach Broadcast → Ergebnisse werden von einem "Judge"-Modell
    bewertet → Bestes Ergebnis oder synthetisierte Zusammenfassung.
 """
+from __future__ import annotations
 
 import asyncio
 import time
 import logging
 import json
 from dataclasses import dataclass, field
-from typing import Optional, Callable
+from typing import Optional, Callable, Any
 
 from config  import get_config
 from audit   import AuditLog
@@ -91,10 +92,11 @@ class MultiKIDispatcher:
     MAX_CONCURRENT     = int(__import__('os').getenv("DISPATCHER_MAX_CONCURRENT", "3"))
 
     def __init__(self):
-        self.logic   = get_logic()
-        self.cfg     = get_config()
-        self._relay  = None    # lazy
-        self._browser= None    # lazy
+        self.logic    = get_logic()
+        self.cfg      = get_config()
+        self._relay   = None    # lazy
+        self._browser = None    # lazy
+        self._executor= None    # lazy
         log.info("MultiKIDispatcher online")
 
     def _get_relay(self):
@@ -108,6 +110,12 @@ class MultiKIDispatcher:
             from browser import get_browser
             self._browser = get_browser()
         return self._browser
+
+    def _get_executor(self):
+        if not self._executor:
+            from executor import get_executor
+            self._executor = get_executor()
+        return self._executor
 
     # ── Modus-Erkennung ───────────────────────────────────────────────────────
     def bestimme_modus(self, prompt: str,
@@ -335,67 +343,20 @@ class MultiKIDispatcher:
                  f"{len(judge_antwort.split())} Wörter")
         return judge_antwort, used_judge
 
-    # ── Prompt-Zerlegung ──────────────────────────────────────────────────────
+    # ── Prompt-Zerlegung (Delegiert an Decomposer) ─────────────────────────────
     def _zerlege_prompt(self, prompt: str, n: int) -> list[str]:
-        """Zerlegt einen komplexen Prompt in n atomare Sub-Tasks."""
-        themen = self.logic.extract_topics(prompt)
-
-        # Explizite Aufzählung im Prompt?
-        items = self._extrahiere_liste(prompt)
-        if len(items) >= 2:
-            # Liste aufteilen
-            chunks = self._chunk_list(items, n)
-            return [
-                f"Beantworte ausführlich folgende Punkte aus der Aufgabe "
-                f"'{prompt[:60]}...':\n" + "\n".join(f"- {x}" for x in chunk)
-                for chunk in chunks
-            ]
-
-        # Themen-basierte Zerlegung
-        zerlegungen = []
-        aspekte = [
-            "Hintergrund, Geschichte und Ursprung",
-            "Hauptmerkmale, Eigenschaften und Details",
-            "Beispiele, Anwendungen und Vergleiche",
-            "Aktuelle Entwicklungen und Ausblick",
-        ][:n]
-
-        for aspekt in aspekte:
-            zerlegungen.append(
-                f"Fokus auf: {aspekt}\n"
-                f"Im Kontext von: {prompt}\n\n"
-                f"Beantworte ausführlich und detailliert."
-            )
-        return zerlegungen
-
-    def _extrahiere_liste(self, text: str) -> list[str]:
-        """Extrahiert Listenpunkte aus einem Prompt."""
-        # Nummerierte Liste
-        items = re.findall(r'^\s*\d+[\.\)]\s*(.+)$', text, re.MULTILINE)
-        if items:
-            return items
-        # Bullet-Liste
-        items = re.findall(r'^\s*[-•]\s*(.+)$', text, re.MULTILINE)
-        if items:
-            return items
-        # Komma-getrennte Liste bei kurzen Prompts
-        if "," in text and len(text) < 200:
-            parts = [p.strip() for p in text.split(",") if len(p.strip()) > 3]
-            if len(parts) >= 3:
-                return parts
-        return []
-
-    def _chunk_list(self, items: list, n: int) -> list[list]:
-        """Teilt eine Liste in n möglichst gleiche Teile."""
-        k, m = divmod(len(items), n)
-        chunks = []
-        start = 0
-        for i in range(n):
-            end = start + k + (1 if i < m else 0)
-            if start < len(items):
-                chunks.append(items[start:end])
-            start = end
-        return [c for c in chunks if c]
+        """Delegiert die atomare Zerlegung an den AtomicDecomposer."""
+        from decomposer import get_decomposer
+        decomposer = get_decomposer()
+        fragmente = decomposer.atomisiere(prompt)
+        if len(fragmente) >= n:
+            return fragmente[:n]
+        # Falls weniger Fragmente als Instanzen: auffüllen/aufteilen
+        if not fragmente:
+            fragmente = [prompt]
+        while len(fragmente) < n:
+            fragmente.append(fragmente[-1])
+        return fragmente[:n]
 
     def _aggregiere(self, antworten: list[str], original: str) -> str:
         """Fasst Sub-Task-Antworten zu einer zusammen."""
@@ -426,9 +387,10 @@ class MultiKIDispatcher:
         return await self._get_single(iid, prompt, system)
 
     async def _get_single(self, iid: str, prompt: str,
-                          system: str) -> tuple[str, float]:
+                          system: str,
+                          parent_id: Optional[str] = None) -> tuple[str, float]:
         """
-        Flexible Anfrage: erst Browser-Instanz, dann API-Provider.
+        Flexible Anfrage über Executor (Subtask), mit Browser/Relay als Ausführungsziel.
         """
         t0 = time.monotonic()
 
@@ -437,13 +399,25 @@ class MultiKIDispatcher:
         inst = browser._instances.get(iid)
         if inst and inst.aktiv:
             antwort = await browser.ask_instance(iid, prompt)
-        else:
-            # API-Provider als Fallback
-            relay = self._get_relay()
-            antwort, _ = await relay.ask_with_fallback(
-                prompt, system=system, preferred=iid
-            )
+            return antwort, time.monotonic() - t0
 
+        executor = self._get_executor()
+        from executor import TaskType, Strategy
+        task = executor.create_task(
+            typ=TaskType.CHAT,
+            prompt=prompt,
+            beschreibung=f"dispatcher_subtask:{iid}:{prompt[:40]}",
+            provider=iid,
+            parent_id=parent_id,
+            system_prompt=system,
+            strategy=Strategy(
+                allow_tools=False,
+                allow_followup=False,
+                allow_provider_switch=True,
+            ),
+        )
+        task = await executor.submit_and_wait(task, timeout=120.0)
+        antwort = task.antwort or task.fehler or "[Keine Antwort]"
         return antwort, time.monotonic() - t0
 
     def stats(self) -> dict:

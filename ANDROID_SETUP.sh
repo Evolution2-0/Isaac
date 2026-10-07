@@ -39,7 +39,7 @@ fi
 
 echo "[2/5] Cloning Isaac..."
 if [ ! -d "Isaac" ]; then
-    git clone https://github.com/glinkasteffen075-bit/Isaac.git
+    git clone https://github.com/hansheute88/isaac.git
 else
     echo "  (Isaac directory already exists)"
 fi

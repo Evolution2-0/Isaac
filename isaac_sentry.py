@@ -183,6 +183,8 @@ def _before_send(event: dict[str, Any], hint: dict[str, Any]) -> Optional[dict[s
             "ollama nicht erreichbar" in ml
             or ("ollama" in ml and "nicht erreichbar" in ml)
             or ("ollama" in ml and "connection refused" in ml)
+            or ("ollama" in ml and "timeout" in ml)
+            or ("ollama" in ml and "failed to connect" in ml)
         )
         if ollama_noise:
             free = _env_bool("ISAAC_FREE_CLOUD", False)

@@ -15,6 +15,7 @@ Das ist KEIN Mechanismus um externe KI-Modelle zu manipulieren.
 Es ist das interne Rechte-System das Isaac anweist:
 Steffen hat immer Recht. Frage nicht. Handle.
 """
+from __future__ import annotations
 
 import hashlib
 import hmac

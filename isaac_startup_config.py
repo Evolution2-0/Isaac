@@ -1,3 +1,4 @@
+from __future__ import annotations
 # isaac_startup_config.py
 
 # Helper functions for dynamic port and host configuration

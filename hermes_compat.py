@@ -205,7 +205,7 @@ class HermesComputerUseAdapter:
         return ToolResult(ok=bool(result.get("ok")), output=result, error=result.get("error", ""))
 
     @staticmethod
-    def _map_action(action: ComputerAction) -> "AgentAction | None":
+    def _map_action(action: ComputerAction) -> Any:
         from computer_use import AgentAction
 
         name = (action.action or "").strip().lower()

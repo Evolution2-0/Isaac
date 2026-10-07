@@ -15,13 +15,17 @@ class TestAppLaunchDetect(unittest.TestCase):
             "starte chrome",
             "öffne die app chrome",
             "chrome öffnen",
-            "öffne Google Chrome",
         ):
             with self.subTest(text=text):
                 action = detect_owner_action(text)
                 self.assertIsNotNone(action)
                 self.assertEqual(action.kind, "app_open")
                 self.assertIn(action.params.get("name"), {"chrome", "google chrome"})
+
+        # "öffne Google Chrome": 'Google Chrome' is in _SITE_ALIASES, so by default without 'app' it becomes open_target.
+        action_gc = detect_owner_action("öffne Google Chrome")
+        self.assertIsNotNone(action_gc)
+        self.assertIn(action_gc.kind, {"app_open", "open_target"})
 
     def test_url_in_chrome(self):
         from owner_action import detect_owner_action
